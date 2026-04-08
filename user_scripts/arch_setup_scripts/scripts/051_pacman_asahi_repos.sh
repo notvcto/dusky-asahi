@@ -11,7 +11,7 @@
 # The repo is distributed via GitHub Releases at:
 #   https://github.com/asahi-alarm/asahi-alarm/releases/download/$arch
 #
-# Run order: after 050_pacman_config.sh, before 060_package_installation.sh
+# Run order: after 040_pacman_config.sh, before 060_package_installation_asahi.sh
 # Privilege: S (root)
 # -----------------------------------------------------------------------------
 

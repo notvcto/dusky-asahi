@@ -28,7 +28,7 @@
 #    - 051_pacman_asahi_repos.sh        added (Asahi overlay + mesa-asahi-edge)
 #    - 060_package_installation_asahi.sh instead of 060_package_installation.sh
 #    - 100_paru_packages_asahi.sh       instead of 100_paru_packages.sh
-#    - 055_pacman_reflector.sh          runs with ignore-fail (ALARM mirrors differ)
+#    - 055_pacman_reflector.sh          omitted (x86 Arch mirrors only; ALARM uses GitHub Releases)
 #    - 380_nvidia_open_source.sh        removed (no NVIDIA on Apple Silicon)
 #    - 381_nvidia_services.sh           removed
 #    - 395_intel_media_sdk_check.sh     removed (no Intel on Apple Silicon)
