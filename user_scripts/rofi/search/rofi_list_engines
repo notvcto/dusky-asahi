@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+# Rofi Web Search Script (Bash)
+
+# Dependencies
+REQUIRED=(surfraw rofi xdg-open)
+for cmd in "${REQUIRED[@]}"; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        echo "Required dependency '$cmd' missing. Install with: sudo pacman -S $cmd"
+        exit 1
+    fi
+done
+
+# Browser setup
+if command -v firefox >/dev/null 2>&1; then
+    export BROWSER=${BROWSER:-firefox}
+else
+    export BROWSER=xdg-open
+fi
+
+# Config file for custom searches
+SEARCH_CONFIG="$HOME/.config/surfraw/custom_searches.conf"
+
+# Prevent surfraw from loading user elvi directory
+export SURFRAW_elvi_path="/usr/lib/surfraw"
+
+# Kill existing rofi menus
+pkill rofi 2>/dev/null
+
+# ----------------------------
+# Custom URLs
+# ----------------------------
+declare -A CUSTOM_URLS
+declare -A CUSTOM_DESCRIPTIONS
+
+# Load from config
+if [[ -f "$SEARCH_CONFIG" ]]; then
+    while IFS='|' read -r prefix url description; do
+        [[ -z "$prefix" || "$prefix" == \#* ]] && continue
+        CUSTOM_URLS["$prefix"]="$url"
+        CUSTOM_DESCRIPTIONS["$prefix"]="$description"
+    done < "$SEARCH_CONFIG"
+fi
+
+# Built-in examples
+CUSTOM_URLS["f"]="https://www.flipkart.com/search?q={query}"
+CUSTOM_DESCRIPTIONS["f"]="Flipkart"
+
+CUSTOM_URLS["m"]="https://www.myntra.com/search?q={query}"
+CUSTOM_DESCRIPTIONS["m"]="Myntra"
+
+CUSTOM_URLS["a"]="https://www.amazon.in/s?k={query}"
+CUSTOM_DESCRIPTIONS["a"]="Amazon.in"
+
+# ----------------------------
+# Build menu
+# ----------------------------
+MENU_ITEMS=""
+
+# Surfraw engines (only system defaults, skip user directory)
+if command -v sr >/dev/null 2>&1; then
+    while read -r engine; do
+        [[ -n "$engine" ]] && MENU_ITEMS+="$engine\n"
+    done < <(sr -elvi | awk '{print $1}' | grep -v '^$')
+fi
+
+# Custom URLs
+for key in "${!CUSTOM_URLS[@]}"; do
+    desc="${CUSTOM_DESCRIPTIONS[$key]}"
+    MENU_ITEMS+="$desc ($key)\n"
+done
+
+# Remove duplicates and sort, filter empty lines
+MENU_ITEMS=$(echo -e "$MENU_ITEMS" | grep -v '^$' | sort -u)
+
+# ----------------------------
+# Show menu
+# ----------------------------
+CHOICE=$(echo -e "$MENU_ITEMS" | rofi -dmenu -i -p "Choose Search Engine:")
+[[ -z "$CHOICE" ]] && exit
+
+# ----------------------------
+# Determine engine type
+# ----------------------------
+# If exact match in Surfraw engines -> use sr
+if sr -elvi | awk '{print $1}' | grep -qx "$CHOICE"; then
+    ENGINE="$CHOICE"
+    TYPE="surfraw"
+else
+    # Custom URL
+    PREFIX=$(echo "$CHOICE" | awk -F'[()]' '{print $2}')
+    TYPE="custom"
+fi
+
+# ----------------------------
+# Get query
+# ----------------------------
+QUERY=$(rofi -dmenu -p "Search query:")
+[[ -z "$QUERY" ]] && exit
+
+# ----------------------------
+# Execute search
+# ----------------------------
+if [[ "$TYPE" == "surfraw" ]]; then
+    sr "$ENGINE" "$QUERY"
+else
+    URL_TEMPLATE="${CUSTOM_URLS[$PREFIX]}"
+    FINAL_URL=${URL_TEMPLATE//\{query\}/$(echo "$QUERY" | sed 's/ /+/g')}
+    xdg-open "$FINAL_URL"
+fi

@@ -1,0 +1,31 @@
+[Unit]
+Description=Dusky Control Center Daemon
+# Wait for Hyprland to be ready to avoid "Display not found" errors
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=dbus
+BusName=com.github.dusky.controlcenter
+
+# CRITICAL: Forces Python to flush logs immediately for real-time debugging
+Environment=PYTHONUNBUFFERED=1
+
+# ENABLE RAM TRACKING
+MemoryAccounting=yes
+
+# The %h specifier automatically inserts your home directory path
+ExecStart=%h/user_scripts/dusky_system/control_center/dusky_control_center.py --gapplication-service
+
+# Restart automatically if it crashes
+Restart=always
+RestartSec=3
+
+# Logs will show up as "dusky[PID]: ..."
+SyslogIdentifier=dusky
+
+# Better process scheduling group
+Slice=app.slice
+
+[Install]
+WantedBy=graphical-session.target

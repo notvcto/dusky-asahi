@@ -1,0 +1,20 @@
+.config/hypr/source/animations/active/active.conf
+user_scripts/tts_stt/dusky_kokoro/trigger.sh
+user_scripts/tts_stt/dusky_whisper/trigger.sh
+user_scripts/tts_stt/dusky_parakeet/trigger.sh
+.config/uwsm/env.d/gpu
+
+# Personal Obsidian vault content — off-topic for public repo
+Documents/pensive/Adobe/
+Documents/pensive/Windows/
+Documents/pensive/templates/
+Documents/pensive/z_temp/
+Documents/pensive/linux/Important Notes/IOS/
+Documents/pensive/linux/Post Install Setup/More +/ai_prompt/
+
+# QEMU test environment — local dev only
+ArchLinuxARM-aarch64-latest.tar.gz
+qemu_asahi_test_setup.sh
+
+# Claude Code session file
+CLAUDE.md

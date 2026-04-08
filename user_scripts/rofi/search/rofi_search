@@ -1,0 +1,198 @@
+#!/usr/bin/env bash
+
+REQUIRED=(surfraw rofi xdg-open)
+for cmd in "${REQUIRED[@]}"; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        echo "Required dependency '$cmd' is missing."
+        echo "Install with: sudo pacman -S $cmd"
+        exit 1
+    fi
+done
+
+if ! command -v firefox >/dev/null 2>&1; then
+    export BROWSER=xdg-open
+else
+    export BROWSER=${BROWSER:-firefox}
+fi
+
+export SEARCH_CONFIG="$HOME/.config/surfraw/custom_searches.conf"
+
+add_search() {
+    local prefix="$1"
+    local url="$2"
+    local description="$3"
+
+    if [[ -z "$prefix" || -z "$url" || -z "$description" ]]; then
+        echo "Usage: $0 --add <prefix> <url_template> <description>"
+        exit 1
+    fi
+
+    mkdir -p "$(dirname "$SEARCH_CONFIG")"
+    echo "$prefix|$url|$description" >> "$SEARCH_CONFIG"
+    echo "Added: $prefix -> $description"
+    exit 0
+}
+
+list_searches() {
+    if [[ ! -f "$SEARCH_CONFIG" ]]; then
+        echo "No custom searches configured yet."
+        exit 0
+    fi
+
+    echo "Custom Search Engines:"
+    echo "====================="
+
+    while IFS='|' read -r prefix url description; do
+        [[ -z "$prefix" || "$prefix" == \#* ]] && continue
+        echo "$prefix/ -> $description"
+        echo "   URL: $url"
+    done < "$SEARCH_CONFIG"
+
+    exit 0
+}
+
+remove_search() {
+    local prefix="$1"
+
+    if [[ -z "$prefix" ]]; then
+        echo "Usage: $0 --remove <prefix>"
+        exit 1
+    fi
+
+    if [[ ! -f "$SEARCH_CONFIG" ]]; then
+        echo "No custom searches configured."
+        exit 1
+    fi
+
+    grep -v "^$prefix|" "$SEARCH_CONFIG" > "${SEARCH_CONFIG}.tmp"
+    mv "${SEARCH_CONFIG}.tmp" "$SEARCH_CONFIG"
+
+    echo "Removed: $prefix"
+    exit 0
+}
+
+case "$1" in
+    --add)
+        add_search "$2" "$3" "$4"
+        ;;
+    --list)
+        list_searches
+        ;;
+    --remove)
+        remove_search "$2"
+        ;;
+    --help)
+        cat <<EOF
+Rofi Web Search Script
+
+Usage:
+  $0
+  $0 --add <prefix> <url> <description>
+  $0 --list
+  $0 --remove <prefix>
+
+Examples:
+  $0 --add tw 'https://twitter.com/search?q={query}' 'Twitter Search'
+EOF
+        exit 0
+        ;;
+esac
+
+pkill rofi 2>/dev/null
+
+declare -A CUSTOM_URLS
+declare -A CUSTOM_DESCRIPTIONS
+declare -A PREFIX_MAP
+
+if [[ -f "$SEARCH_CONFIG" ]]; then
+    while IFS='|' read -r prefix url description; do
+        [[ -z "$prefix" || "$prefix" == \#* ]] && continue
+        CUSTOM_URLS["$prefix"]="$url"
+        CUSTOM_DESCRIPTIONS["$prefix"]="$description"
+    done < "$SEARCH_CONFIG"
+fi
+
+CUSTOM_URLS["f"]="https://www.flipkart.com/search?q={query}"
+CUSTOM_DESCRIPTIONS["f"]="Flipkart Search"
+
+CUSTOM_URLS["m"]="https://www.myntra.com/search?q={query}"
+CUSTOM_DESCRIPTIONS["m"]="Myntra Search"
+
+CUSTOM_URLS["a"]="https://www.amazon.in/s?k={query}"
+CUSTOM_DESCRIPTIONS["a"]="Amazon India"
+
+assign_unique_prefix() {
+    local name="$1"
+    local prefix="${name:0:1}"
+    local count=1
+
+    while [[ -n "${PREFIX_MAP[$prefix]}" ]]; do
+        count=$((count+1))
+        prefix="${name:0:$count}"
+    done
+
+    echo "$prefix"
+}
+
+if [[ -d /usr/lib/surfraw ]]; then
+    for elvi in /usr/lib/surfraw/*; do
+        [[ -f "$elvi" ]] || continue
+
+        name=$(basename "$elvi")
+
+        prefix=$(assign_unique_prefix "$name")
+        PREFIX_MAP["$prefix"]="$name"
+    done
+fi
+
+if [[ -d "$HOME/.config/surfraw/elvi" ]]; then
+    for elvi in "$HOME/.config/surfraw/elvi"/*; do
+        [[ -f "$elvi" ]] || continue
+
+        name=$(basename "$elvi")
+        prefix=$(assign_unique_prefix "$name")
+
+        PREFIX_MAP["$prefix"]="$name"
+    done
+fi
+
+for key in "${!CUSTOM_URLS[@]}"; do
+    PREFIX_MAP["$key"]="CUSTOM:$key"
+done
+
+echo "Available prefixes:"
+
+for key in "${!CUSTOM_URLS[@]}"; do
+    echo "$key/ -> ${CUSTOM_DESCRIPTIONS[$key]}"
+done
+
+for key in "${!PREFIX_MAP[@]}"; do
+    val="${PREFIX_MAP[$key]}"
+    [[ "$val" == CUSTOM:* ]] && continue
+
+    echo "$key/ -> $val"
+done
+
+echo ""
+
+input=$(rofi -dmenu -i -p "Search (prefix/query):")
+[[ -z "$input" ]] && exit
+
+prefix="${input%%/*}"
+query="${input#*/}"
+
+query="${query## }"
+[[ -z "$query" ]] && exit
+
+if [[ -n "${CUSTOM_URLS[$prefix]}" ]]; then
+    url="${CUSTOM_URLS[$prefix]//\{query\}/$(echo "$query" | sed 's/ /+/g')}"
+    xdg-open "$url"
+
+elif [[ -n "${PREFIX_MAP[$prefix]}" ]]; then
+    engine="${PREFIX_MAP[$prefix]}"
+    engine="${engine#CUSTOM:}"
+
+    sr -browser="$BROWSER" "$engine" "$query"
+else
+    sr -browser="$BROWSER" google "$query"
+fi
