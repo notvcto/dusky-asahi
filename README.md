@@ -167,72 +167,67 @@ Real hardware testing in progress (M1/M2).
 
 ## Overview
 
-**Utilities**
+### Theming & visuals
+
+- **Matugen** — unified light/dark mode across Hyprland, Waybar, Rofi, GTK, Firefox, and Spicetify, all regenerated from your wallpaper
+- Waybar in four layouts: horizontal, vertical, block, circular — pick during setup, toggle from Rofi at any time
+- Instant shader switching via Rofi
+- Fluid animations — tuned physics and momentum for a liquid feel
+- Dusky Control Center — GTK4/Libadwaita GUI for settings and features in one place
+
+### Utilities
 
 - Music recognition — look up what's currently playing
 - Circle-to-search via Google Lens
-- TUI for tuning Hyprland appearance: gaps, shadow color, blur strength, opacity, and more
 - Local AI inference via Ollama sidebar (terminal-based, resource-efficient)
-- Keybind TUI setter with conflict detection — auto-unbinds conflicting entries in `hyprland.conf`
-- Switch Swaync notification panel side (left/right)
-- Live disk I/O monitoring — useful for tracking copy progress on USB drives
+- Color picker
+- Sysbench benchmarking
+- Live disk I/O monitoring — useful for tracking copy progress on external drives
+- BTRFS compression ratio scanner — see how much space ZSTD is saving
+
+### Audio & input
+
 - Quick audio input/output switching via keybind (e.g. speakers ↔ Bluetooth headphones)
 - Mono/stereo audio toggle
-- Touchpad gestures for volume, brightness, screen lock, Swaync, play/pause, mute (laptop/external trackpad)
+- Mechanical keypress sounds, toggleable via keybind or Rofi
+- GUI sliders for volume, brightness, and night light intensity (keybind-invokable)
+- Speech-to-text: Whisper (CPU)
+- Text-to-speech: Kokoro (CPU and GPU)
+- Touchpad gestures for volume, brightness, screen lock, Swaync, play/pause, mute
+
+### Hyprland & desktop
+
+- TUI for tuning Hyprland appearance: gaps, shadow color, blur strength, opacity, and more
+- Keybind TUI setter with conflict detection — auto-unbinds conflicting entries in `hyprland.conf`
+- Dynamic fractional scaling — scale your display with a keybind
+- Toggle window transparency, blur, and shadow with a single keybind
+- Hypridle TUI configuration
+- Switch Swaync notification panel side (left/right)
+- Wlogout drawn dynamically to respect your fractional scaling
 - Battery notifications with configurable threshold levels
 - Toggleable power-saver mode
-- System cleanup — cache purge to reclaim storage
 - USB plug/unplug sounds
+
+### Networking & system
+
 - FTP, Tailscale, OpenSSH auto-setup scripts
 - Cloudflare WARP setup, toggleable from Rofi
 - VNC setup for iPhone (wired)
-- Dynamic fractional scaling script — scale your display with a keybind
-- Toggle window transparency, blur, and shadow with a single keybind
-- Hypridle TUI configuration
 - WiFi connect script at `~/user_scripts/network_manager/nmcli_wifi.sh`
-- Sysbench benchmarking
-- Color picker
-- Neovim, pre-configured
-- GitHub bare-repo backup integration — configure `~/.git_dusky_list` with the files you want to back up
-- BTRFS compression ratio scanner — see how much space ZSTD is saving
-- Drive manager — lock/unlock encrypted drives from the terminal with auto-mount; fix for NTFS drives with corrupted metadata
+- System cleanup — cache purge to reclaim storage
+- Drive manager — lock/unlock encrypted drives from the terminal with auto-mount; NTFS metadata fix included
+- GitHub bare-repo backup integration — configure `~/.git_dusky_list` with files to back up
 
-**Rofi menus**
+### Rofi menus
 
 Emoji · Calculator · Matugen theme switcher · Animation switcher · Power menu · Clipboard · Wallpaper selector · Shader menu · System menu
 
-**GUI sliders (keybind-invokable)**
-
-Volume · Brightness · Night light / hyprsunset intensity
-
-**Speech**
-
-- Speech-to-text: Whisper (CPU)
-- Text-to-speech: Kokoro (CPU and GPU)
-
-**Sounds & visuals**
-
-- Mechanical keypress sounds, toggleable via keybind or Rofi
-- Wlogout drawn dynamically to respect your fractional scaling
-- Instant shader switching via Rofi
-- Fluid animations — tuned physics and momentum for a liquid feel
-
-**Performance & system**
+### Performance
 
 - **Lightweight** — ~900 MB RAM, ~5 GB disk (fully configured)
 - **ZSTD & ZRAM** — compression enabled by default; ZRAM roughly triples effective RAM on low-memory machines
 - **Native build flags** — AUR helper configured to build with CPU-native optimisations
-- **UWSM environment** — Hyprland session managed via UWSM for a clean startup
-
-**Theming**
-
-- **Matugen** drives unified light/dark mode across Hyprland, Waybar, Rofi, GTK, Firefox, and Spicetify — all regenerated from your wallpaper
-- Waybar in four layouts: horizontal, vertical, block, circular — pick during setup, toggle from Rofi
-- Dusky Control Center — GTK4/Libadwaita GUI covering nearly every system setting and feature in one place
-
-**Keybind cheatsheet**
-
-Press `Ctrl + Shift + Space` at any time to open the interactive keybinds cheatsheet. Commands in the menu are clickable.
+- **UWSM** — Hyprland session managed via UWSM for a clean, minimal startup
 
 ---
 
@@ -273,29 +268,35 @@ Key defaults inherited from Dusky:
 
 ## 🔧 Troubleshooting
 
-If a script fails (rolling release — it happens):
+### A script failed mid-run
 
-1. **Don't panic.** Scripts are modular. The rest of the system usually installs fine.
-2. **Check the output.** Identify which subscript failed — they're in `~/user_scripts/arch_setup_scripts/scripts/`.
-3. **Run it manually.** Individual subscripts can be re-run directly.
-4. **Re-run the orchestrator.** `ORCHESTRA_ASAHI.sh` is resumable — completed steps are skipped.
+Scripts are modular — a single failure rarely blocks the rest. The orchestrator is resumable: just re-run `ORCHESTRA_ASAHI.sh` and completed steps are skipped. To identify what failed, check the terminal output and find the subscript by name in `~/user_scripts/arch_setup_scripts/scripts/` — each one can be run individually. To start completely fresh, delete `~/Documents/.install_state_asahi` and re-run.
 
-**Asahi-specific issues:**
+### Blank screen after SDDM starts
 
-**Blank screen after SDDM starts**
-SDDM failed to use the Wayland backend. Check `/etc/sddm.conf.d/20-asahi-wayland.conf` exists and contains `DisplayServer=wayland`. Re-run `466_sddm_asahi_wayland.sh` as root if missing.
+SDDM failed to launch the Wayland backend. Check that `/etc/sddm.conf.d/20-asahi-wayland.conf` exists and contains `DisplayServer=wayland`. If it's missing, re-run `466_sddm_asahi_wayland.sh` as root.
 
-**No audio**
-Check that `alsa-ucm-conf-asahi` is installed (`pacman -Q alsa-ucm-conf-asahi`). If missing, run `051_pacman_asahi_repos.sh` first (sets up the `[asahi-alarm]` repo), then `pacman -S alsa-ucm-conf-asahi`.
+### No audio
 
-**Cursor invisible in Hyprland**
-`WLR_NO_HARDWARE_CURSORS=1` should be set in `~/.config/uwsm/env.d/gpu` by the `035` script. Re-run `035_configure_uwsm_gpu_asahi.sh` if the file is missing.
+Verify `alsa-ucm-conf-asahi` is installed:
 
-**Script failed mid-run**
-ORCHESTRA_ASAHI is resumable. Just re-run it — completed steps are skipped. To restart from scratch, delete `~/Documents/.install_state_asahi` and re-run.
+```bash
+pacman -Q alsa-ucm-conf-asahi
+```
 
-**paru takes 20+ minutes to build**
-Normal on aarch64. The ALARM repos don't ship a paru binary; it compiles from source.
+If missing, run `051_pacman_asahi_repos.sh` first to set up the `[asahi-alarm]` repo, then install it:
+
+```bash
+pacman -S alsa-ucm-conf-asahi
+```
+
+### Cursor invisible in Hyprland
+
+`WLR_NO_HARDWARE_CURSORS=1` must be set in `~/.config/uwsm/env.d/gpu`. Re-run `035_configure_uwsm_gpu_asahi.sh` if the file is missing or empty.
+
+### paru takes 20+ minutes to build
+
+Expected on aarch64 — the ALARM repos don't ship a paru binary, so it compiles from source (Rust project). Let it run.
 
 ---
 
