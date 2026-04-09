@@ -30,9 +30,9 @@ This fork adapts the full Dusky Hyprland desktop environment for M1/M2/M3 hardwa
 - An **M1, M2, or M3 Mac** (MacBook Air, MacBook Pro, Mac Mini, iMac)
 - **macOS** present on the machine to run the Asahi installer
 - An internet connection
-- ~30GB free space recommended
+- ~30 GB free space recommended
 
-The Asahi installer uses **BTRFS** by default — this is required for the snapper snapshot scripts at the end of the setup sequence.
+> **BTRFS recommended:** The snapper snapshot scripts require BTRFS. When the Asahi installer asks about the filesystem during partitioning, choose BTRFS.
 
 ---
 
@@ -40,37 +40,55 @@ The Asahi installer uses **BTRFS** by default — this is required for the snapp
 
 ### Phase 1 — Install Asahi Linux
 
-Run the Asahi ALARM installer from macOS:
+Run the Asahi installer from macOS:
 
 ```bash
 curl https://asahi-alarm.org/installer-bootstrap.sh | sh
 ```
 
-Follow the prompts. When it asks for a distribution, choose **Arch Linux ARM**. The installer will partition your drive, install a minimal ALARM base system, and reboot into Linux.
+Follow the prompts. The installer will partition your drive, install a minimal ALARM base system, and reboot into Linux.
 
-Log in as `alarm` (password: `alarm`).
+Default credentials after first boot:
+- User: `alarm` / Password: `alarm`
+- Root: `root` / Password: `root`
 
 ---
 
 ### Phase 2 — Deploy Dusky Asahi
 
-Install git, clone the dotfiles, and run the orchestrator:
+All pacman operations require root. Switch to root first:
 
 ```bash
-# 1. Install git (not in ALARM base)
-pacman -Syu && pacman -S git
+su root
+# password: root
+```
 
-# 2. Clone the Dusky Asahi dotfiles
-git clone --bare --depth 1 https://github.com/YOUR_USERNAME/dusky-asahi.git ~/dusky
+Initialize the pacman keyring (required on every fresh ALARM install before using pacman):
+
+```bash
+pacman-key --init
+pacman-key --populate archlinuxarm
+```
+
+Install git and clone the dotfiles:
+
+```bash
+pacman -Syu git
+
+git clone --bare --depth 1 https://github.com/notvcto/dusky-asahi.git ~/dusky
 git --git-dir=~/dusky/ --work-tree=$HOME checkout -f
+```
 
-# 3. Run the orchestrator (as your normal user, NOT root)
+Run the orchestrator as your **normal user** (`alarm`), not root:
+
+```bash
+su alarm
 ~/user_scripts/arch_setup_scripts/ORCHESTRA_ASAHI.sh
 ```
 
 The orchestrator runs ~90 numbered scripts sequentially. It is **idempotent** — safe to interrupt and re-run. Progress is tracked in `~/Documents/.install_state_asahi`.
 
-Expect **45–90 minutes** on first run. The longest step is compiling `paru` from source (~20 min — it's a Rust project, and the aarch64 ALARM repos don't ship a paru binary).
+Expect **45–90 minutes** on first run. The longest step is compiling `paru` from source (~20 min — it's a Rust project and the aarch64 ALARM repos don't ship a binary).
 
 ---
 
@@ -81,11 +99,11 @@ Setup is split into numbered subscripts in `user_scripts/arch_setup_scripts/scri
 | Script | What it does |
 |---|---|
 | `035_configure_uwsm_gpu_asahi.sh` | Detects the AGX DRM node and writes `~/.config/uwsm/env.d/gpu` |
-| `051_pacman_asahi_repos.sh` | Adds the `[asahi-alarm]` overlay repo; bootstraps the keyring; ensures sudo and sudoers are present on minimal ALARM |
+| `051_pacman_asahi_repos.sh` | Adds the `[asahi-alarm]` overlay repo; bootstraps the keyring; ensures sudo and sudoers are present |
 | `060_package_installation_asahi.sh` | Full ARM64-adapted package install (Hyprland, PipeWire, mesa from asahi-alarm, etc.) |
 | `100_paru_packages_asahi.sh` | AUR packages with x86-only entries removed; adds `shellcheck-bin` (official ARM64 binary) |
-| `290_system_services_asahi.sh` | Enables system services; `power-profiles-daemon` replaces TLP; `iio-sensor-proxy` for ambient light sensor |
-| `466_sddm_asahi_wayland.sh` | Writes `/etc/sddm.conf.d/20-asahi-wayland.conf` — forces SDDM into Wayland mode (no Xorg on Apple Silicon) |
+| `290_system_services_asahi.sh` | Enables system services; `power-profiles-daemon` replaces TLP; `iio-sensor-proxy` for ambient light |
+| `466_sddm_asahi_wayland.sh` | Forces SDDM into Wayland mode — writes `/etc/sddm.conf.d/20-asahi-wayland.conf` |
 
 Everything else (Hyprland config, theming, Waybar, Rofi, SDDM theme, PipeWire, snapper, etc.) is identical to upstream Dusky.
 
@@ -97,18 +115,18 @@ Real hardware testing in progress (M1/M2).
 
 | Feature | Status | Notes |
 |---|---|---|
-| AGX GPU / Hyprland | Expected ✅ | Requires patched mesa from `[asahi-alarm]` |
-| Display output | Expected ✅ | `WLR_NO_HARDWARE_CURSORS=1` set by default |
-| Audio (speakers/mic) | Expected ✅ | `alsa-ucm-conf-asahi` UCM profiles installed |
-| Bluetooth | Expected ✅ | Asahi kernel has Apple BT controller support |
-| WiFi | Expected ✅ | `brcmfmac` + firmware from Asahi installer |
-| Touchpad gestures | Likely ✅ | `libinput`; Apple Magic Trackpad may need quirks tuning |
-| Battery notifications | Expected ✅ | Detection fixed for `macsmc-battery` naming |
-| Ambient light sensor | Expected ✅ | `iio-sensor-proxy` installed and enabled |
-| Display scaling | Needs testing | `monitor=,preferred,auto,auto` — Hyprland auto-detects ~2x on Retina |
-| Camera (FaceTime HD) | Needs testing | `apple-isp` driver; `cameractrls` and `snapshot` installed |
-| Suspend/resume | Needs testing | Default systemd-logind lid behaviour; S2Idle on Apple Silicon |
-| GPU-accelerated video encode | Not yet | VA-API encode on AGX not stable upstream |
+| AGX GPU / Hyprland | ⚙️ Configured | Requires patched mesa from `[asahi-alarm]` |
+| Display output | ⚙️ Configured | `WLR_NO_HARDWARE_CURSORS=1` set by default |
+| Audio (speakers/mic) | ⚙️ Configured | `alsa-ucm-conf-asahi` UCM profiles installed |
+| Bluetooth | ⚙️ Configured | Asahi kernel has Apple BT controller support |
+| WiFi | ⚙️ Configured | `brcmfmac` + firmware from Asahi installer |
+| Touchpad gestures | ⚙️ Configured | `libinput`; Apple Magic Trackpad may need quirks tuning |
+| Battery notifications | ⚙️ Configured | Detection fixed for `macsmc-battery` naming |
+| Ambient light sensor | ⚙️ Configured | `iio-sensor-proxy` installed and enabled |
+| Display scaling | 🧪 Untested | `monitor=,preferred,auto,auto` — Hyprland auto-detects ~2x on Retina |
+| Camera (FaceTime HD) | 🧪 Untested | `apple-isp` driver; `cameractrls` installed |
+| Suspend/resume | 🧪 Untested | S2Idle on Apple Silicon; default systemd-logind lid behaviour |
+| GPU-accelerated video encode | ❌ Not yet | VA-API encode on AGX not stable upstream |
 
 ---
 
@@ -159,10 +177,10 @@ Check that `alsa-ucm-conf-asahi` is installed (`pacman -Q alsa-ucm-conf-asahi`).
 `WLR_NO_HARDWARE_CURSORS=1` should be set in `~/.config/uwsm/env.d/gpu` by the `035` script. Re-run `035_configure_uwsm_gpu_asahi.sh` if the file is missing.
 
 **Script failed mid-run**
-ORCHESTRA_ASAHI is resumable. Just re-run it — completed steps are skipped. To restart from scratch: `ORCHESTRA_ASAHI.sh --reset`.
+ORCHESTRA_ASAHI is resumable. Just re-run it — completed steps are skipped. To restart from scratch, delete `~/Documents/.install_state_asahi` and re-run.
 
 **paru takes 20+ minutes to build**
-Normal on aarch64. The ALARM repos don't ship a paru binary; it compiles from source. M1/M2 real hardware will be significantly faster than emulation.
+Normal on aarch64. The ALARM repos don't ship a paru binary; it compiles from source.
 
 ---
 
