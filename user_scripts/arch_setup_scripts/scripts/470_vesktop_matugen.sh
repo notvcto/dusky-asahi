@@ -45,6 +45,14 @@ if [[ $EUID -eq 0 ]]; then
     log_error "This script must NOT be run as root. It modifies user configs and uses AUR helpers."
 fi
 
+# On aarch64 (Apple Silicon), vesktop-bin is x86_64-only.
+# Use 'vesktop' instead — it builds from source and explicitly supports aarch64.
+if [[ "$(uname -m)" == "aarch64" ]]; then
+    readonly VESKTOP_PKG="vesktop"
+else
+    readonly VESKTOP_PKG="vesktop-bin"
+fi
+
 # ==============================================================================
 #  Phase 0: User Consent & State Logic
 # ==============================================================================
@@ -116,12 +124,12 @@ if ! command -v matugen &>/dev/null; then
     log_warn "'matugen' is not installed. Theme generation will not work until it is."
 fi
 
-# Install vesktop-bin
-if pacman -Qi vesktop-bin &>/dev/null; then
-    log_success "vesktop-bin is already installed."
+# Install vesktop (vesktop-bin on x86_64, vesktop source build on aarch64)
+if pacman -Qi "${VESKTOP_PKG}" &>/dev/null; then
+    log_success "${VESKTOP_PKG} is already installed."
 else
-    log_info "Installing vesktop-bin via ${AUR_HELPER}..."
-    "$AUR_HELPER" -S --needed --noconfirm vesktop-bin
+    log_info "Installing ${VESKTOP_PKG} via ${AUR_HELPER}..."
+    "$AUR_HELPER" -S --needed --noconfirm "${VESKTOP_PKG}"
 fi
 
 # ==============================================================================

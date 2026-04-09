@@ -121,7 +121,7 @@ main() {
         printf '# Remove this line once your Hyprland cursor renders correctly.\n'
         printf 'export WLR_NO_HARDWARE_CURSORS=1\n'
         printf '\n'
-        printf '# VA-API: mesa-asahi-edge handles autodetection — do not force LIBVA_DRIVER_NAME.\n'
+        printf '# VA-API: mesa (from asahi-alarm repo) handles autodetection — do not force LIBVA_DRIVER_NAME.\n'
     } >"$TEMP_OUTPUT"
 
     chmod 0644 -- "$TEMP_OUTPUT"

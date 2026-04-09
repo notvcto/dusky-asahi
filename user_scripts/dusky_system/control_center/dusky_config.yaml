@@ -83,7 +83,7 @@ pages:
         style: destructive
       on_press:
         type: exec
-        command: $HOME/user_scripts/wlogout/wlogout_scale.sh
+        command: $HOME/user_scripts/rofi/powermenu.sh
         terminal: false
 
   - type: section
@@ -97,7 +97,7 @@ pages:
         title: Active Profile
         description: Select performance mode
         icon: power-profile-balanced-symbolic
-        value_command: "tlpctl get"
+        value_command: "powerprofilesctl get"
         interval: 2
         options:
         - Balanced
@@ -110,13 +110,13 @@ pages:
       on_change:
         Balanced:
           type: exec
-          command: tlpctl balanced && notify-send 'Power Profile' 'Switched to Balanced'
+          command: powerprofilesctl set balanced && notify-send 'Power Profile' 'Switched to Balanced'
         Performance:
           type: exec
-          command: tlpctl performance && notify-send 'Power Profile' 'Switched to Performance'
+          command: powerprofilesctl set performance && notify-send 'Power Profile' 'Switched to Performance'
         Power Saver:
           type: exec
-          command: tlpctl power-saver && notify-send 'Power Profile' 'Switched to Power Saver'
+          command: powerprofilesctl set power-saver && notify-send 'Power Profile' 'Switched to Power Saver'
   - type: section
     properties:
       title: Quick Controls
@@ -229,7 +229,7 @@ pages:
         button_text: "Step 2"
       on_press:
         type: exec
-        command: kitty --class ORCHESTRA.sh --hold sh -c $HOME/user_scripts/arch_setup_scripts/ORCHESTRA.sh
+        command: kitty --class ORCHESTRA_ASAHI.sh --hold sh -c $HOME/user_scripts/arch_setup_scripts/ORCHESTRA_ASAHI.sh
         terminal: false
 
 
@@ -818,7 +818,7 @@ pages:
         title: Active Profile
         description: Select performance mode
         icon: power-profile-balanced-symbolic
-        value_command: "tlpctl get"
+        value_command: "powerprofilesctl get"
         interval: 2
         options:
         - Balanced
@@ -831,13 +831,13 @@ pages:
       on_change:
         Balanced:
           type: exec
-          command: tlpctl balanced && notify-send 'Power Profile' 'Switched to Balanced'
+          command: powerprofilesctl set balanced && notify-send 'Power Profile' 'Switched to Balanced'
         Performance:
           type: exec
-          command: tlpctl performance && notify-send 'Power Profile' 'Switched to Performance'
+          command: powerprofilesctl set performance && notify-send 'Power Profile' 'Switched to Performance'
         Power Saver:
           type: exec
-          command: tlpctl power-saver && notify-send 'Power Profile' 'Switched to Power Saver'
+          command: powerprofilesctl set power-saver && notify-send 'Power Profile' 'Switched to Power Saver'
     - type: toggle
       properties:
         title: Dusky Power Saver
@@ -1620,7 +1620,7 @@ pages:
                 button_text: "Run"
               on_press:
                 type: exec
-                command: kitty --class 000_configure_uwsm_gpu.sh --hold sh -c "$HOME/user_scripts/arch_setup_scripts/scripts/035_configure_uwsm_gpu.sh"
+                command: kitty --class 035_configure_uwsm_gpu_asahi.sh --hold sh -c "$HOME/user_scripts/arch_setup_scripts/scripts/035_configure_uwsm_gpu_asahi.sh"
         - type: section
           properties:
             title: Environment Variable files
