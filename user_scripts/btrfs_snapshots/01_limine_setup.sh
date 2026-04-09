@@ -12,6 +12,14 @@ LIMINE_WALLPAPER_SOURCE=""
 set -Eeuo pipefail
 export LC_ALL=C
 
+# Architecture Guard — Limine is an x86/EFI bootloader.
+# Asahi Linux uses Apple's iBoot → m1n1 boot chain; Limine cannot be installed.
+if [[ "$(uname -m)" == "aarch64" ]]; then
+    printf '\e[1;33m[NOTICE]\e[0m Limine is an x86/EFI bootloader and cannot run on Apple Silicon (aarch64).\n'
+    printf '         Asahi Linux uses iBoot → m1n1 — no third-party bootloader setup needed.\n'
+    exit 0
+fi
+
 AUTO_MODE=false
 [[ "${1:-}" == "--auto" ]] && AUTO_MODE=true
 

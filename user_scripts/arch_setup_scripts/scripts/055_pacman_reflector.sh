@@ -3,6 +3,15 @@
 
 set -euo pipefail
 
+# Architecture Guard — reflector manages x86 Arch Linux mirrors only.
+# ALARM uses GitHub Releases for the asahi-alarm overlay; no mirror ranking needed.
+if [[ "$(uname -m)" == "aarch64" ]]; then
+    printf '\e[1;33m[NOTICE]\e[0m reflector is not applicable on Arch Linux ARM (aarch64).\n'
+    printf '         ALARM mirrors are managed via the asahi-alarm GitHub Releases repo.\n'
+    printf '         Run: sudo pacman -Syy  to refresh the database instead.\n'
+    exit 0
+fi
+
 # --- CONFIGURATION ---
 readonly TARGET_FILE="/etc/pacman.d/mirrorlist"
 readonly DEFAULT_COUNTRY="list"
