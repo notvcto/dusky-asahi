@@ -259,7 +259,7 @@ Key defaults inherited from Dusky:
 |---|---|
 | `Super + Q` | Open terminal (kitty) |
 | `Super + E` | File manager (Nemo) |
-| `Super + F` | Firefox |
+| `Super + W` | Browser (Firefox) |
 | `Alt + Space` | Rofi launcher |
 | `Super + S` | Screenshot / screen capture |
 | `Super + M` | Lock screen (hyprlock) |
