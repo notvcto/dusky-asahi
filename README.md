@@ -93,7 +93,7 @@ Everything else (Hyprland config, theming, Waybar, Rofi, SDDM theme, PipeWire, s
 
 ## Hardware status
 
-Tested in a QEMU aarch64 VM. Real hardware testing pending.
+Real hardware testing in progress (M1/M2).
 
 | Feature | Status | Notes |
 |---|---|---|
@@ -162,7 +162,7 @@ Check that `alsa-ucm-conf-asahi` is installed (`pacman -Q alsa-ucm-conf-asahi`).
 ORCHESTRA_ASAHI is resumable. Just re-run it — completed steps are skipped. To restart from scratch: `ORCHESTRA_ASAHI.sh --reset`.
 
 **paru takes 20+ minutes to build**
-Normal on aarch64. The ALARM repos don't ship a paru binary; it compiles from source. M1/M2 real hardware will be significantly faster than QEMU.
+Normal on aarch64. The ALARM repos don't ship a paru binary; it compiles from source. M1/M2 real hardware will be significantly faster than emulation.
 
 ---
 
