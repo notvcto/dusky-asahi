@@ -69,7 +69,6 @@ declare -ar PACKAGES=(
   # wifitui-bin: PKGBUILD arch=('x86_64') — prebuilt x86_64 binary only
   "otf-atkinson-hyperlegible-next"
   "python-pywalfox"
-  "python-pyquery"
   "hyprshade"
   "hyprshutdown"
   "waypaper"

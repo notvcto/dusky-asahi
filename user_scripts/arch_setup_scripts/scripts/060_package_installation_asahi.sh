@@ -25,6 +25,7 @@ declare -ar pkgs_graphics=(
   # jack). Without this, audio devices will not appear or will not function
   # correctly on real M1/M2 hardware. Provided by the [asahi-alarm] overlay repo.
   "alsa-ucm-conf-asahi"
+  "base" "base-devel"
 )
 
 # Group 2: Hyprland Core
@@ -39,7 +40,7 @@ declare -ar pkgs_appearance=(
   "qt5-wayland" "qt6-wayland" "gtk3" "gtk4" "nwg-look" "qt5ct" "qt6ct"
   "qt6-svg" "qt6-multimedia-ffmpeg" "adw-gtk-theme" "upower" "plocate"
   "matugen" "ttf-font-awesome" "ttf-jetbrains-mono-nerd" "noto-fonts-emoji"
-  "sassc" "python-packaging" "python" "fontconfig" "papirus-icon-theme"
+  "sassc" "python-packaging" "python" "fontconfig" "papirus-icon-theme" "python-pyquery"
 )
 
 # Group 4: Desktop Experience

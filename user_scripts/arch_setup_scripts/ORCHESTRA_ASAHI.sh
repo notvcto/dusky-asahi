@@ -126,6 +126,7 @@ INSTALL_SEQUENCE=(
     "U | 400_firefox_matugen_pywalfox.sh"
     "U | 410_waybar_swap_config.sh"
     "U | 415_mpv_setup.sh"
+    "U | 434_wayclick_soundpacks_download.sh --auto"
     "U | 440_config_bat_notify.sh --default"
     "U | 455_hyprctl_reload.sh"
     "U | 460_switch_clipboard.sh --terminal"
