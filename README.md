@@ -1,10 +1,26 @@
-# Dusky Asahi — Apple Silicon Port
+<div align="center">
 
-A port of [Dusky](https://github.com/dusklinux/dusky) to **Apple Silicon Macs** running **Asahi Linux** (Arch Linux ARM / ALARM).
+# Dusky Asahi
 
-This fork adapts the full Dusky Hyprland desktop environment for M1/M2/M3 hardware — AGX GPU, Apple audio, unified memory, and Asahi's boot chain — while staying as close to the upstream experience as possible.
+**The full Dusky Hyprland desktop, native on Apple Silicon**
 
-> **Upstream credit:** All the desktop design, theming architecture, scripts, and features come from [Dusky by dusklinux](https://github.com/dusklinux/dusky). This repo is purely an adaptation layer. If you're on x86, use the original.
+[![License: MIT](https://img.shields.io/badge/License-MIT-5c6bc0?style=flat-square)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/notvcto/dusky-asahi?style=flat-square&color=ffd700&label=Stars)](https://github.com/notvcto/dusky-asahi)
+[![Apple Silicon](https://img.shields.io/badge/Apple_Silicon-M1%20%7C%20M2%20%7C%20M3-silver?style=flat-square&logo=apple&logoColor=white)](https://asahilinux.org)
+[![Arch Linux ARM](https://img.shields.io/badge/Arch_Linux_ARM-aarch64-1793d1?style=flat-square&logo=archlinux&logoColor=white)](https://archlinuxarm.org)
+[![Asahi Linux](https://img.shields.io/badge/Asahi_Linux-compatible-f97316?style=flat-square)](https://asahilinux.org)
+[![Hyprland](https://img.shields.io/badge/Hyprland-Wayland-58e1ff?style=flat-square)](https://hyprland.org)
+[![Upstream: Dusky](https://img.shields.io/badge/upstream-dusklinux%2Fdusky-6e40c9?style=flat-square)](https://github.com/dusklinux/dusky)
+
+<br>
+
+*A port of [Dusky](https://github.com/dusklinux/dusky) to M1 / M2 / M3 Macs running [Asahi Linux](https://asahilinux.org) (Arch Linux ARM). Every feature of the Dusky experience — Matugen theming, Waybar layouts, Rofi menus, the Dusky Control Center, BTRFS snapshots, PipeWire audio — adapted for ARM64 and the Asahi boot chain, with AGX GPU support and Apple audio profiles.*
+
+*If you're on x86, use the [original Dusky](https://github.com/dusklinux/dusky). All credit for the desktop design, theming system, and features belongs there — this repo is purely an adaptation layer.*
+
+</div>
+
+---
 
 ---
 
@@ -25,28 +41,47 @@ This fork adapts the full Dusky Hyprland desktop environment for M1/M2/M3 hardwa
 
 ---
 
-## Prerequisites
+## ⚠️ Prerequisites & Hardware
+
+### Hardware
 
 - An **M1, M2, or M3 Mac** (MacBook Air, MacBook Pro, Mac Mini, iMac)
 - **macOS** present on the machine to run the Asahi installer
 - An internet connection
 - ~30 GB free space recommended
 
-> **BTRFS recommended:** The snapper snapshot scripts require BTRFS. When the Asahi installer asks about the filesystem during partitioning, choose BTRFS.
+### Filesystem
+
+> **BTRFS recommended.** When the Asahi installer asks which variant to install, choose the **BTRFS desktop** option. It automatically sets up two subvolumes (`@` for `/` and `@home` for `/home`) — exactly what the snapper snapshot scripts expect.
+
+BTRFS also gives you:
+
+- ZSTD compression to save disk space
+- Copy-on-Write to prevent data corruption
+- Instant snapshots via snapper
+
+The setup should also work on ext4, but snapshots won't be available.
+
+### GPU
+
+GPU environment is auto-detected by `035_configure_uwsm_gpu_asahi.sh`, which writes `~/.config/uwsm/env.d/gpu`. If detection fails, edit that file manually and set `AQ_DRM_DEVICES` to your DRM node (e.g. `/dev/dri/card0`).
 
 ---
 
-## Installation
+## Installation 💿
 
 ### Phase 1 — Install Asahi Linux
 
-Run the Asahi installer from macOS:
+Run the Asahi ALARM installer from macOS Terminal:
 
 ```bash
 curl https://asahi-alarm.org/installer-bootstrap.sh | sh
 ```
 
-Follow the prompts. The installer will partition your drive, install a minimal ALARM base system, and reboot into Linux.
+When prompted by the installer:
+
+- Choose **Desktop** (not minimal) — installs the full GUI environment
+- Choose the **BTRFS variant** — sets up `@` and `@home` subvolumes automatically
 
 Default credentials after first boot:
 - User: `alarm` / Password: `alarm`
@@ -130,6 +165,77 @@ Real hardware testing in progress (M1/M2).
 
 ---
 
+## Overview
+
+**Utilities**
+
+- Music recognition — look up what's currently playing
+- Circle-to-search via Google Lens
+- TUI for tuning Hyprland appearance: gaps, shadow color, blur strength, opacity, and more
+- Local AI inference via Ollama sidebar (terminal-based, resource-efficient)
+- Keybind TUI setter with conflict detection — auto-unbinds conflicting entries in `hyprland.conf`
+- Switch Swaync notification panel side (left/right)
+- Live disk I/O monitoring — useful for tracking copy progress on USB drives
+- Quick audio input/output switching via keybind (e.g. speakers ↔ Bluetooth headphones)
+- Mono/stereo audio toggle
+- Touchpad gestures for volume, brightness, screen lock, Swaync, play/pause, mute (laptop/external trackpad)
+- Battery notifications with configurable threshold levels
+- Toggleable power-saver mode
+- System cleanup — cache purge to reclaim storage
+- USB plug/unplug sounds
+- FTP, Tailscale, OpenSSH auto-setup scripts
+- Cloudflare WARP setup, toggleable from Rofi
+- VNC setup for iPhone (wired)
+- Dynamic fractional scaling script — scale your display with a keybind
+- Toggle window transparency, blur, and shadow with a single keybind
+- Hypridle TUI configuration
+- WiFi connect script at `~/user_scripts/network_manager/nmcli_wifi.sh`
+- Sysbench benchmarking
+- Color picker
+- Neovim, pre-configured
+- GitHub bare-repo backup integration — configure `~/.git_dusky_list` with the files you want to back up
+- BTRFS compression ratio scanner — see how much space ZSTD is saving
+- Drive manager — lock/unlock encrypted drives from the terminal with auto-mount; fix for NTFS drives with corrupted metadata
+
+**Rofi menus**
+
+Emoji · Calculator · Matugen theme switcher · Animation switcher · Power menu · Clipboard · Wallpaper selector · Shader menu · System menu
+
+**GUI sliders (keybind-invokable)**
+
+Volume · Brightness · Night light / hyprsunset intensity
+
+**Speech**
+
+- Speech-to-text: Whisper (CPU)
+- Text-to-speech: Kokoro (CPU and GPU)
+
+**Sounds & visuals**
+
+- Mechanical keypress sounds, toggleable via keybind or Rofi
+- Wlogout drawn dynamically to respect your fractional scaling
+- Instant shader switching via Rofi
+- Fluid animations — tuned physics and momentum for a liquid feel
+
+**Performance & system**
+
+- **Lightweight** — ~900 MB RAM, ~5 GB disk (fully configured)
+- **ZSTD & ZRAM** — compression enabled by default; ZRAM roughly triples effective RAM on low-memory machines
+- **Native build flags** — AUR helper configured to build with CPU-native optimisations
+- **UWSM environment** — Hyprland session managed via UWSM for a clean startup
+
+**Theming**
+
+- **Matugen** drives unified light/dark mode across Hyprland, Waybar, Rofi, GTK, Firefox, and Spicetify — all regenerated from your wallpaper
+- Waybar in four layouts: horizontal, vertical, block, circular — pick during setup, toggle from Rofi
+- Dusky Control Center — GTK4/Libadwaita GUI covering nearly every system setting and feature in one place
+
+**Keybind cheatsheet**
+
+Press `Ctrl + Shift + Space` at any time to open the interactive keybinds cheatsheet. Commands in the menu are clickable.
+
+---
+
 ## Customising your setup
 
 All user-editable config lives in:
@@ -148,9 +254,9 @@ monitor=eDP-1, preferred, auto, 2.0
 
 ---
 
-## Keybinds
+## ⌨️ Keybinds
 
-Press `Ctrl + Shift + Space` to open the keybinds cheatsheet at any time.
+Press `Ctrl + Shift + Space` to open the keybinds cheatsheet at any time. Commands in the cheatsheet are clickable.
 
 Key defaults inherited from Dusky:
 
@@ -165,7 +271,16 @@ Key defaults inherited from Dusky:
 
 ---
 
-## Troubleshooting
+## 🔧 Troubleshooting
+
+If a script fails (rolling release — it happens):
+
+1. **Don't panic.** Scripts are modular. The rest of the system usually installs fine.
+2. **Check the output.** Identify which subscript failed — they're in `~/user_scripts/arch_setup_scripts/scripts/`.
+3. **Run it manually.** Individual subscripts can be re-run directly.
+4. **Re-run the orchestrator.** `ORCHESTRA_ASAHI.sh` is resumable — completed steps are skipped.
+
+**Asahi-specific issues:**
 
 **Blank screen after SDDM starts**
 SDDM failed to use the Wayland backend. Check `/etc/sddm.conf.d/20-asahi-wayland.conf` exists and contains `DisplayServer=wayland`. Re-run `466_sddm_asahi_wayland.sh` as root if missing.
