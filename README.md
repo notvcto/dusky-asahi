@@ -52,7 +52,7 @@
 
 ### Filesystem
 
-> **BTRFS recommended.** When the Asahi installer asks which variant to install, choose the **BTRFS desktop** option. It automatically sets up two subvolumes (`@` for `/` and `@home` for `/home`) — exactly what the snapper snapshot scripts expect.
+> **BTRFS recommended.** When the Asahi installer asks which variant to install, choose the **BTRFS ** option. It automatically sets up two subvolumes (`@` for `/` and `@home` for `/home`) — exactly what the snapper snapshot scripts expect.
 
 BTRFS also gives you:
 
@@ -80,7 +80,8 @@ curl https://asahi-alarm.org/installer-bootstrap.sh | sh
 
 When prompted by the installer:
 
-- Choose **Desktop** (not minimal) — installs the full GUI environment
+- Choose **Desktop** (NOT minimal)
+- Choose **Hyprland** 
 - Choose the **BTRFS variant** — sets up `@` and `@home` subvolumes automatically
 
 Default credentials after first boot:
