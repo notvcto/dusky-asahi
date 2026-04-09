@@ -2,6 +2,14 @@
 # Arch Linux (EFI + Btrfs root) | Limine core setup
 # Bash 5.3+
 
+# Architecture Guard — Limine is an x86/EFI bootloader.
+# Asahi Linux uses Apple's iBoot → m1n1 boot chain; Limine cannot be installed.
+if [[ "$(uname -m)" == "aarch64" ]]; then
+    printf '\e[1;33m[NOTICE]\e[0m Limine is an x86/EFI bootloader and cannot run on Apple Silicon (aarch64).\n'
+    printf '         Asahi Linux uses iBoot → m1n1 — no third-party bootloader setup needed.\n'
+    exit 0
+fi
+
 # --- USER CONFIGURATION ---
 # Set the path to your custom Limine wallpaper here.
 # Note: Limine STRICTLY supports PNG, JPEG, and BMP formats.
@@ -11,14 +19,6 @@ LIMINE_WALLPAPER_SOURCE=""
 
 set -Eeuo pipefail
 export LC_ALL=C
-
-# Architecture Guard — Limine is an x86/EFI bootloader.
-# Asahi Linux uses Apple's iBoot → m1n1 boot chain; Limine cannot be installed.
-if [[ "$(uname -m)" == "aarch64" ]]; then
-    printf '\e[1;33m[NOTICE]\e[0m Limine is an x86/EFI bootloader and cannot run on Apple Silicon (aarch64).\n'
-    printf '         Asahi Linux uses iBoot → m1n1 — no third-party bootloader setup needed.\n'
-    exit 0
-fi
 
 AUTO_MODE=false
 [[ "${1:-}" == "--auto" ]] && AUTO_MODE=true
@@ -507,21 +507,23 @@ prepare_limine_nvram_for_install() {
 }
 
 limine_state_appears_current() {
-    local esp_target loader_path
+    local esp_target loader_path limine_conf
 
     esp_target="$(detect_esp_mountpoint 2>/dev/null || true)"
     [[ -n "$esp_target" ]] || return 1
+    
     loader_path="${esp_target}/EFI/limine/limine_x64.efi"
+    limine_conf="${esp_target}/limine.conf"
 
-    sudo_path_is_file /boot/limine.conf || return 1
+    sudo_path_is_file "$limine_conf" || return 1
     sudo_path_is_file "$loader_path" || return 1
 
     if sudo_path_is_file /etc/kernel/cmdline; then
-        sudo_path_not_older_than /boot/limine.conf /etc/kernel/cmdline || return 1
+        sudo_path_not_older_than "$limine_conf" /etc/kernel/cmdline || return 1
     fi
 
     if sudo_path_is_file /etc/default/limine; then
-        sudo_path_not_older_than /boot/limine.conf /etc/default/limine || return 1
+        sudo_path_not_older_than "$limine_conf" /etc/default/limine || return 1
     fi
 
     return 0
@@ -676,7 +678,7 @@ configure_limine_defaults() {
 }
 
 deploy_limine() {
-    local esp_target esp_partuuid canonical_present=false canonical_entry=""
+    local esp_target esp_partuuid canonical_present=false canonical_entry="" limine_conf
 
     esp_target="$(detect_esp_mountpoint)" || fatal "Could not detect ESP mount."
     esp_partuuid="$(get_mount_partuuid "$esp_target" || true)"
@@ -721,7 +723,8 @@ deploy_limine() {
         warn "No canonical Limine NVRAM entry found; BootOrder left unchanged."
     fi
 
-    sudo_path_is_file /boot/limine.conf || fatal "/boot/limine.conf was not created."
+    limine_conf="${esp_target}/limine.conf"
+    sudo_path_is_file "$limine_conf" || fatal "${limine_conf} was not created."
     info "Limine deployment completed."
 }
 
@@ -731,7 +734,12 @@ limine_conf_has_theme_directives() {
 }
 
 apply_limine_theme() {
-    local conf="/boot/limine.conf"
+    local esp_target conf
+    
+    esp_target="$(detect_esp_mountpoint 2>/dev/null || true)"
+    [[ -n "$esp_target" ]] || return 0
+    
+    conf="${esp_target}/limine.conf"
     sudo_path_is_file "$conf" || return 0
 
     local theme_marker="# --- UI Theme ---"
@@ -762,8 +770,6 @@ EOF
         local ext="${LIMINE_WALLPAPER_SOURCE##*.}"
         ext="${ext,,}"
         if [[ "$ext" =~ ^(png|jpg|jpeg|bmp)$ ]]; then
-            local esp_target
-            esp_target="$(detect_esp_mountpoint 2>/dev/null || true)"
             if [[ -n "$esp_target" ]]; then
                 local wp_dest="${esp_target}/limine-wallpaper.${ext}"
                 sudo cp "$LIMINE_WALLPAPER_SOURCE" "$wp_dest"
