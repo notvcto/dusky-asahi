@@ -76,6 +76,8 @@ declare -ar PACKAGES=(
   # shellcheck-bin: official ARM64 binary released by shellcheck upstream ✓
   "shellcheck-bin"
   "xdg-terminal-exec"
+  # spotube: native ARM64 Spotify client (replaces spotify + spicetify on aarch64)
+  "spotube"
 )
 
 declare -ir TIMEOUT_SEC=5

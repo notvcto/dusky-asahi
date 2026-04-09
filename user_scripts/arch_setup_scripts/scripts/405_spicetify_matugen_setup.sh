@@ -10,6 +10,14 @@
 # Strict Mode
 set -Eeuo pipefail
 
+# Architecture Guard — Spicetify requires the official Spotify desktop client,
+# which has no ARM64 Linux binary.
+if [[ "$(uname -m)" == "aarch64" ]]; then
+    printf '\e[1;33m[NOTICE]\e[0m Spicetify requires the official Spotify client, which has no ARM64 Linux binary.\n'
+    printf '         Skipping on Asahi/ALARM. Use spotube as a native ARM64 alternative.\n'
+    exit 0
+fi
+
 # --- Configuration ---
 readonly REQUIRED_BASH_MAJOR=5
 readonly REQUIRED_BASH_MINOR=3
