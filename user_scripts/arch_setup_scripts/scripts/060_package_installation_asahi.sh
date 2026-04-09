@@ -150,7 +150,7 @@ declare -ar pkgs_productivity=(
 # limine removed: Asahi uses its own boot chain (iBoot → m1n1 → U-Boot)
 # efibootmgr/efitools removed: Asahi manages EFI entries; manual edits can
 #   break the Asahi boot chain
-declare -ar btrfs_snapshot=(
+declare -ar pkgs_btrfs_snapshot=(
   "kernel-modules-hook" "btrfs-progs" "snapper" "snap-pac"
   "jdk-openjdk" "mtools"
 )
@@ -186,7 +186,7 @@ declare -ar GROUP_ARRAYS=(
   pkgs_sysadmin
   pkgs_gnome
   pkgs_productivity
-  btrfs_snapshot
+  pkgs_btrfs_snapshot
 )
 
 # --- 2. EARLY ROOT CHECK ---

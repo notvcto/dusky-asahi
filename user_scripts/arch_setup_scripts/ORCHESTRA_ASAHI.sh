@@ -94,7 +94,7 @@ INSTALL_SEQUENCE=(
     "U | dusky_matugen_config_tui.sh --smart"
 
     "U | 145_matugen_directories.sh"
-    "U | 150_wallpapers_download.sh"
+#   150_wallpapers_download.sh — omitted: removed from upstream orchestra (Apr 2026)
     "U | 155_blur_shadow_opacity.sh"
     "U | 160_theme_ctl.sh"
     "U | 165_qtct_config.sh"
@@ -124,7 +124,7 @@ INSTALL_SEQUENCE=(
     "U | 390_clipboard_persistance.sh --ram --quiet"
 #   395_intel_media_sdk_check.sh — omitted: no Intel GPU on Apple Silicon
     "U | 400_firefox_matugen_pywalfox.sh"
-    "U | 410_waybar_swap_config.sh"
+    "U | 410_waybar_swap_config.sh --toggle"
     "U | 415_mpv_setup.sh"
     "U | 434_wayclick_soundpacks_download.sh --auto"
     "U | 440_config_bat_notify.sh --default"

@@ -130,9 +130,7 @@ build_helper() {
     chown -R "$r_user:$r_group" "$BUILD_DIR"
     chmod 700 "$BUILD_DIR"
 
-    # Use runuser (not sudo -u) — root may not be in ALARM's sudoers by default.
-    # runuser switches identity without requiring a sudoers entry.
-    if ! runuser -u "$r_user" -- bash -c '
+    if ! sudo -u "$r_user" bash -c '
         set -euo pipefail
         cd "$1"
         git clone --depth 1 "$2" "$3"

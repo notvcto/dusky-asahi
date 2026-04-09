@@ -211,7 +211,7 @@ Real hardware testing in progress (M1/M2).
 
 ### Networking & system
 
-- FTP, Tailscale, OpenSSH auto-setup scripts
+- FTP, Tailscale, and OpenSSH setup — available on-demand from the Control Center (Network → Remote)
 - Cloudflare WARP setup, toggleable from Rofi
 - VNC setup for iPhone (wired)
 - WiFi connect script at `~/user_scripts/network_manager/nmcli_wifi.sh`

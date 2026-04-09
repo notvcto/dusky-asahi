@@ -83,7 +83,7 @@ pages:
         style: destructive
       on_press:
         type: exec
-        command: $HOME/user_scripts/rofi/powermenu.sh
+        command: $HOME/user_scripts/wlogout/wlogout_scale.sh
         terminal: false
 
   - type: section
