@@ -319,30 +319,4 @@ post_hook   = '''
 [templates.sddm_sync]
 input_path  = '~/.config/matugen/templates/colors.css' # Any valid template file
 output_path = '~/.config/matugen/generated/sddm-sync-check'
-post_hook   = 'sudo /usr/bin/sddm-sync "{{image}}"'
-
-[templates.fastfetch]
-input_path  = '~/.config/matugen/templates/fastfetch-colors.tpl'
-output_path = '~/.config/matugen/generated/fastfetch-colors.jsonc'
-post_hook   = '''
-FF_CONFIG="$HOME/.config/fastfetch/config.jsonc"
-GEN="$HOME/.config/matugen/generated/fastfetch-colors.jsonc"
-TMP="$(mktemp)"
-mkdir -p "$HOME/.config/fastfetch/pngs"
-
-if command -v jq >/dev/null 2>&1 && [ -f "$FF_CONFIG" ]; then
-  COLORS_JSON=$(sed -E 's:/\*.*\*/::g' "$GEN" 2>/dev/null || cat "$GEN")
-  jq --argjson c "$(echo "$COLORS_JSON" | jq -c .)" '.colors = $c' "$FF_CONFIG" > "$TMP" && mv "$TMP" "$FF_CONFIG" || :
-fi
-
-if command -v convert >/dev/null 2>&1; then
-  ACCENT="{{colors.primary.default.hex}}"
-  SRC="$HOME/.config/fastfetch/pngs/arch-base.png"
-  DST="$HOME/.config/fastfetch/pngs/arch.png"
-  if [ -f "$SRC" ]; then
-    convert "$SRC" -fill "$ACCENT" -colorize 100% "$DST" || :
-  else
-    convert -size 256x256 xc:none -fill "$ACCENT" -draw "circle 128,128 128,20" "$DST" || :
-  fi
-fi
-'''
+post_hook   = 'printf "%s" "{{image}}" > /tmp/sddm-sync-pending'

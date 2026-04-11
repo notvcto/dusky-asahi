@@ -149,6 +149,40 @@ install_theme() {
     log_success "Theme files copied."
 }
 
+install_sddm_sync_units() {
+    log_info "Installing sddm-sync..."
+    curl -fsSL https://get.notvc.to/sddm-sync -o /usr/local/bin/sddm-sync
+    chmod 755 /usr/local/bin/sddm-sync
+    log_success "sddm-sync installed to /usr/local/bin/sddm-sync."
+    log_info "Installing sddm-sync systemd units..."
+
+    cat > /etc/systemd/system/sddm-sync.service <<'EOF'
+[Unit]
+Description=Sync wallpaper to SDDM theme
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c 'wall=$(cat /tmp/sddm-sync-pending 2>/dev/null); /usr/local/bin/sddm-sync "$wall"'
+EOF
+
+    cat > /etc/systemd/system/sddm-sync.path <<'EOF'
+[Unit]
+Description=Watch for SDDM wallpaper sync requests
+
+[Path]
+PathModified=/tmp/sddm-sync-pending
+Unit=sddm-sync.service
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    systemctl daemon-reload
+    systemctl enable --now sddm-sync.path
+    log_success "sddm-sync path unit installed and enabled."
+}
+
 configure_sddm() {
     log_info "Configuring SDDM..."
     mkdir -p /etc/sddm.conf.d
@@ -233,6 +267,7 @@ check_conflicts
 setup_sddm_service
 get_source_files
 install_theme
+install_sddm_sync_units
 configure_sddm
 setup_avatar
 
