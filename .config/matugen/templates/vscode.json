@@ -1,6 +1,4 @@
 {
-  // user prefs
-
     "window.menuBarVisibility": "toggle",
     "editor.scrollbar.vertical": "hidden",
     "editor.scrollbar.verticalScrollbarSize": 0,
@@ -48,8 +46,8 @@
     "syntax.bracket3": "{{colors.tertiary_container.dark.hex}}",
     "syntax.bracket4": "{{colors.primary_container.dark.hex}}",
 
-    "explorer.confirmDragAndDrop": false,
-    "workbench.colorTheme": "Material Code"
+    "explorer.confirmDragAndDrop": false
 
-  }
+  },
+  "workbench.colorTheme": "Material Code"
 }
