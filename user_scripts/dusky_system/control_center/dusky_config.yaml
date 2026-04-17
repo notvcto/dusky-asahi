@@ -2343,13 +2343,13 @@ pages:
           items:
             - type: button
               properties:
-                title: 'Step 1: Limine Setup'
-                description: Configure Limine bootloader for BTRFS
-                icon: computer-symbolic
+                title: 'Step 1: BTRFS Subvolumes'
+                description: Create @log and @pkg subvolumes (ALARM only ships @ and @home)
+                icon: drive-harddisk-system-symbolic
                 button_text: "Setup"
               on_press:
                 type: exec
-                command: kitty --class 01_limine_setup.sh --hold sh -c "$HOME/user_scripts/btrfs_snapshots/01_limine_setup.sh --auto"
+                command: kitty --class 053_btrfs_subvolumes_asahi.sh --hold sh -c "sudo $HOME/user_scripts/arch_setup_scripts/scripts/053_btrfs_subvolumes_asahi.sh"
                 terminal: false
             - type: button
               properties:

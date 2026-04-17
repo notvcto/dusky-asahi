@@ -28,6 +28,7 @@
 #    - 051_pacman_asahi_repos.sh        added (Asahi overlay + mesa-asahi-edge)
 #    - 060_package_installation_asahi.sh instead of 060_package_installation.sh
 #    - 100_paru_packages_asahi.sh       instead of 100_paru_packages.sh
+#    - 053_btrfs_subvolumes_asahi.sh    added (creates @log + @pkg; ALARM only ships @ and @home)
 #    - 055_pacman_reflector.sh          omitted (x86 Arch mirrors only; ALARM uses GitHub Releases)
 #    - 380_nvidia_open_source.sh        removed (no NVIDIA on Apple Silicon)
 #    - 381_nvidia_services.sh           removed
@@ -79,6 +80,7 @@ INSTALL_SEQUENCE=(
 #   055_pacman_reflector.sh omitted: reflector is x86 Arch mirrors only;
 #   ALARM uses GitHub Releases for the asahi-alarm repo — no mirror ranking needed.
     "S | 051_pacman_asahi_repos.sh"
+    "S | 053_btrfs_subvolumes_asahi.sh"
     "S | 060_package_installation_asahi.sh"
     "U | 065_enabling_user_services.sh"
     "S | 070_openssh_setup.sh --auto"
