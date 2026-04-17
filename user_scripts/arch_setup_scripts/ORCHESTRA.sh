@@ -31,6 +31,8 @@ POST_SCRIPT_DELAY=0
 
 INSTALL_SEQUENCE=(
 
+    "U | 003_network_connect.sh"
+
 # ------ CUSTOM PATH SCRIPTS -------
     "U | deploy_dotfiles.sh --force"
 
@@ -67,7 +69,7 @@ INSTALL_SEQUENCE=(
     "U | dusky_matugen_config_tui.sh --smart"
 
     "U | 145_matugen_directories.sh"
-    "U | 150_wallpapers_download.sh"
+#    "U | 150_wallpapers_download.sh"
     "U | 155_blur_shadow_opacity.sh"
     "U | 160_theme_ctl.sh"
     "U | 165_qtct_config.sh"
@@ -116,7 +118,7 @@ INSTALL_SEQUENCE=(
 #    "U | 356_dusky_plugin_manager.sh"
     "U | 360_obsidian_pensive_vault_configure.sh"
     "U | 365_cache_purge.sh"
-    "S | 370_arch_install_scripts_cleanup.sh"
+    "S | 370_arch_install_scripts_cleanup.sh --auto"
     "U | 375_cursor_theme_bibata_classic_modern.sh"
     "U | 376_generate_colorfiles_for_current_wallpaer.sh"
     "U | 380_nvidia_open_source.sh --auto"
@@ -126,17 +128,18 @@ INSTALL_SEQUENCE=(
     "S | 395_intel_media_sdk_check.sh --auto"
     "U | 400_firefox_matugen_pywalfox.sh"
 #    "U | 405_spicetify_matugen_setup.sh"
-    "U | 410_waybar_swap_config.sh"
+    "U | 410_waybar_swap_config.sh --toggle"
     "U | 415_mpv_setup.sh"
 #    "U | 420_kokoro_gpu_setup.sh" #requires nvidia gpu with at least 4gb vram
 #    "U | 425_parakeet_gpu_setup.sh" #requires nvidia gpu with at least 4gb vram
 #    "S | 430_btrfs_zstd_compression_stats.sh"
+    "U | 434_wayclick_soundpacks_download.sh --auto"
 #    "U | 435_key_sound_wayclick_setup.sh --setup"
     "U | 440_config_bat_notify.sh --default"
     "U | 455_hyprctl_reload.sh"
     "U | 460_switch_clipboard.sh --terminal"
-    "S | 465_sddm_setup.sh --auto"
-    "U | 470_vesktop_matugen.sh --auto"
+#    "S | 465_sddm_setup.sh --auto"
+#    "U | 470_vesktop_matugen.sh --auto"
     "U | 475_reverting_sleep_timeout.sh"
     "U | 480_dusky_commands.sh"
     "S | 485_sudoers_nopassword.sh"
@@ -633,6 +636,7 @@ Options:
     --help, -h       Show this help message and exit
     --dry-run, -d    Preview execution plan without running anything
     --reset          Clear progress state and start fresh
+    --manual, -m     Prompt to enable interactive mode (ask before each script)
 
 Description:
     This script orchestrates the execution of multiple setup scripts
@@ -648,7 +652,8 @@ Description:
     not supported.
 
 Examples:
-    $(basename "$0")              # Normal run
+    $(basename "$0")              # Normal run (Autonomous Mode)
+    $(basename "$0") --manual     # Run with prompt for Interactive Mode
     $(basename "$0") --dry-run    # Preview what would be executed
     $(basename "$0") --reset      # Reset progress and start over
 EOF
@@ -761,10 +766,15 @@ main() {
     fi
 
     # --- MUTATING ARGUMENT HANDLING ---
+    local force_manual_prompt=0
+
     case "${1:-}" in
         --reset)
             rm -f "$STATE_FILE"
             echo "State file reset. Starting fresh."
+            ;;
+        --manual|-m)
+            force_manual_prompt=1
             ;;
         "")
             ;;
@@ -808,11 +818,16 @@ main() {
 
     # --- EXECUTION MODE SELECTION ---
     local interactive_mode=0
-    echo -e "\n${YELLOW}>>> EXECUTION MODE <<<${RESET}"
-    read -r -p "Do you want to run interactively (prompt before every script)? [y/N]: " _mode_choice
-    if [[ "${_mode_choice,,}" == "y" || "${_mode_choice,,}" == "yes" ]]; then
-        interactive_mode=1
-        log "INFO" "Interactive mode selected. You will be asked before each script."
+
+    if [[ "$force_manual_prompt" -eq 1 ]]; then
+        echo -e "\n${YELLOW}>>> EXECUTION MODE <<<${RESET}"
+        read -r -p "Do you want to run interactively (prompt before every script)? [y/N]: " _mode_choice
+        if [[ "${_mode_choice,,}" == "y" || "${_mode_choice,,}" == "yes" ]]; then
+            interactive_mode=1
+            log "INFO" "Interactive mode selected. You will be asked before each script."
+        else
+            log "INFO" "Autonomous mode selected. Running all scripts without confirmation."
+        fi
     else
         log "INFO" "Autonomous mode selected. Running all scripts without confirmation."
     fi

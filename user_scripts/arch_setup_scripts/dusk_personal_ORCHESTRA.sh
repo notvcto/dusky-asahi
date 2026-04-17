@@ -31,8 +31,10 @@ POST_SCRIPT_DELAY=0
 
 INSTALL_SEQUENCE=(
 
+    "U | 003_network_connect.sh"
+
 # ------ CUSTOM PATH SCRIPTS -------
-#    "U | deploy_dotfiles.sh"
+    "U | deploy_dotfiles.sh"
 
 # ------ Setup SCRIPTS -------
 
@@ -101,8 +103,8 @@ INSTALL_SEQUENCE=(
     "U | 300_git_config.sh"
     "U | 305_new_github_repo_to_backup.sh"
     "U | 310_reconnect_and_push_new_changes_to_github.sh"
-    "S | 315_grub_optimization.sh"
-    "S | 320_systemdboot_optimization.sh"
+#    "S | 315_grub_optimization.sh"
+#    "S | 320_systemdboot_optimization.sh"
     "S | 325_hosts_files_block.sh"
     "S | 330_gtk_root_symlink.sh"
     "S | 335_preload_config.sh"
@@ -128,6 +130,7 @@ INSTALL_SEQUENCE=(
     "U | 420_kokoro_gpu_setup.sh" #requires nvidia gpu with at least 4gb vram
     "U | 425_parakeet_gpu_setup.sh" #requires nvidia gpu with at least 4gb vram
     "S | 430_btrfs_zstd_compression_stats.sh"
+    "U | 434_wayclick_soundpacks_download.sh --auto"
     "U | 435_key_sound_wayclick_setup.sh --setup"
     "U | 440_config_bat_notify.sh"
     "U | 455_hyprctl_reload.sh"
@@ -630,6 +633,7 @@ Options:
     --help, -h       Show this help message and exit
     --dry-run, -d    Preview execution plan without running anything
     --reset          Clear progress state and start fresh
+    --manual, -m     Prompt to enable interactive mode (ask before each script)
 
 Description:
     This script orchestrates the execution of multiple setup scripts
@@ -645,7 +649,8 @@ Description:
     not supported.
 
 Examples:
-    $(basename "$0")              # Normal run
+    $(basename "$0")              # Normal run (Autonomous Mode)
+    $(basename "$0") --manual     # Run with prompt for Interactive Mode
     $(basename "$0") --dry-run    # Preview what would be executed
     $(basename "$0") --reset      # Reset progress and start over
 EOF
@@ -758,10 +763,15 @@ main() {
     fi
 
     # --- MUTATING ARGUMENT HANDLING ---
+    local force_manual_prompt=0
+
     case "${1:-}" in
         --reset)
             rm -f "$STATE_FILE"
             echo "State file reset. Starting fresh."
+            ;;
+        --manual|-m)
+            force_manual_prompt=1
             ;;
         "")
             ;;
@@ -805,11 +815,16 @@ main() {
 
     # --- EXECUTION MODE SELECTION ---
     local interactive_mode=0
-    echo -e "\n${YELLOW}>>> EXECUTION MODE <<<${RESET}"
-    read -r -p "Do you want to run interactively (prompt before every script)? [y/N]: " _mode_choice
-    if [[ "${_mode_choice,,}" == "y" || "${_mode_choice,,}" == "yes" ]]; then
-        interactive_mode=1
-        log "INFO" "Interactive mode selected. You will be asked before each script."
+
+    if [[ "$force_manual_prompt" -eq 1 ]]; then
+        echo -e "\n${YELLOW}>>> EXECUTION MODE <<<${RESET}"
+        read -r -p "Do you want to run interactively (prompt before every script)? [y/N]: " _mode_choice
+        if [[ "${_mode_choice,,}" == "y" || "${_mode_choice,,}" == "yes" ]]; then
+            interactive_mode=1
+            log "INFO" "Interactive mode selected. You will be asked before each script."
+        else
+            log "INFO" "Autonomous mode selected. Running all scripts without confirmation."
+        fi
     else
         log "INFO" "Autonomous mode selected. Running all scripts without confirmation."
     fi

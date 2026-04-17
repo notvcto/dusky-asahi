@@ -1,23 +1,23 @@
 {
-    "window.menuBarVisibility": "toggle",
-    "editor.scrollbar.vertical": "hidden",
-    "editor.scrollbar.verticalScrollbarSize": 0,
-    "security.workspace.trust.untrustedFiles": "newWindow",
-    "security.workspace.trust.startupPrompt": "never",
-    "security.workspace.trust.enabled": false,
-    "editor.minimap.side": "right",
-    "extensions.autoUpdate": false,
-    "workbench.statusBar.visible": false,
-    "terminal.external.linuxExec": "kitty",
-    "terminal.explorerKind": "both",
-    "terminal.sourceControlRepositoriesKind": "both",
-    "telemetry.telemetryLevel": "off",
-    "workbench.activityBar.location": "top",
-    "window.customTitleBarVisibility": "auto",
-    "workbench.sideBar.location": "right",
-    "window.controlsStyle": "hidden",
-
-    "material-code.colors": {
+  "window.menuBarVisibility": "toggle",
+  "editor.scrollbar.vertical": "hidden",
+  "editor.scrollbar.verticalScrollbarSize": 0,
+  "security.workspace.trust.untrustedFiles": "newWindow",
+  "security.workspace.trust.startupPrompt": "never",
+  "security.workspace.trust.enabled": false,
+  "editor.minimap.side": "right",
+  "extensions.autoUpdate": false,
+  "workbench.statusBar.visible": false,
+  "terminal.external.linuxExec": "kitty",
+  "terminal.explorerKind": "both",
+  "terminal.sourceControlRepositoriesKind": "both",
+  "telemetry.telemetryLevel": "off",
+  "workbench.activityBar.location": "top",
+  "window.customTitleBarVisibility": "auto",
+  "workbench.sideBar.location": "right",
+  "window.controlsStyle": "hidden",
+  "workbench.colorTheme": "Material Code",
+  "material-code.colors": {
     "primary": "{{colors.primary.dark.hex}}",
     "foreground": "{{colors.on_surface.dark.hex}}",
     "mutedForeground": "{{colors.primary.dark.hex}}",
@@ -44,10 +44,6 @@
     "syntax.bracket1": "{{colors.secondary_fixed.dark.hex}}",
     "syntax.bracket2": "{{colors.tertiary.dark.hex}}",
     "syntax.bracket3": "{{colors.tertiary_container.dark.hex}}",
-    "syntax.bracket4": "{{colors.primary_container.dark.hex}}",
-
-    "explorer.confirmDragAndDrop": false
-
-  },
-  "workbench.colorTheme": "Material Code"
+    "syntax.bracket4": "{{colors.primary_container.dark.hex}}"
+  }
 }

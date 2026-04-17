@@ -31,7 +31,7 @@ declare -ar pkgs_graphics=(
 # Group 2: Hyprland Core
 declare -ar pkgs_hyprland=(
   "hyprland" "uwsm" "xorg-xwayland" "xdg-desktop-portal-hyprland"
-  "xdg-desktop-portal-gtk" "xorg-xhost" "polkit" "hyprpolkitagent"
+  "xdg-desktop-portal-gtk" "polkit" "hyprpolkitagent"
   "xdg-utils" "socat" "inotify-tools" "libnotify" "file"
 )
 
@@ -85,7 +85,7 @@ declare -ar pkgs_network=(
   "inetutils" "wget" "curl" "openssh" "firewalld" "vsftpd"
   # reflector removed: x86 Arch only, not in ALARM repos
   "bmon" "ethtool" "httrack" "wavemon" "firefox"
-  "network-manager-applet" "nss-mdns" "dnsmasq" "modemmanager"
+  "nss-mdns" "dnsmasq" "modemmanager"
   "usb_modeswitch"
 )
 
@@ -94,7 +94,7 @@ declare -ar pkgs_terminal=(
   "kitty" "foot" "zsh" "zsh-syntax-highlighting" "starship" "fastfetch"
   "bat" "eza" "fd" "yazi" "gum" "tree" "fzf" "less" "ripgrep" "expac"
   "zsh-autosuggestions" "iperf3" "pkgstats" "libqalculate" "moreutils"
-  "zoxide"
+  "zoxide" "opencode"
 )
 
 # Group 9: Development

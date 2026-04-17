@@ -104,13 +104,6 @@ run_spotx() {
 
 # --- Main Logic ---
 
-# 0. Architecture Guard
-if [[ "$(uname -m)" == "aarch64" ]]; then
-    printf "${C_BOLD}${C_WARN}[NOTICE]${C_RESET} Spotify has no ARM64 Linux binary — this script cannot run on Asahi/ALARM.\n"
-    printf "         Native alternative: %bspotube%b (install via paru/yay)\n" "${C_INFO}" "${C_RESET}"
-    exit 0
-fi
-
 # 1. User Confirmation
 printf "${C_BOLD}${C_WARN}[?]${C_RESET} Do you want to install/update Spotify? [y/N] "
 read -r response

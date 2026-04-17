@@ -113,22 +113,22 @@ post_hook   = '''
   pkill -SIGUSR1 -x kitty || :
 '''
 
-# [templates.opencode]
-# input_path = '~/.config/matugen/templates/opencode-colors.json'
-# output_path = '~/.config/matugen/generated/opencode.json'
-# post_hook   = '''
-# ln -nfs "$HOME/.config/matugen/generated/opencode.json" "$HOME/.config/opencode/themes/matugen.json"
-# pkill -SIGUSR1 -x kitty || :
-# '''
-
-[templates.vscode]
-input_path  = '~/.config/matugen/templates/vscode.json'
-output_path = '~/.config/Code/User/settings.json'
+[templates.opencode]
+input_path = '~/.config/matugen/templates/opencode-colors.json'
+output_path = '~/.config/matugen/generated/opencode.json'
 post_hook   = '''
-  if command -v vscodium >/dev/null 2>&1; then
-  ln -nfs "$HOME/.config/matugen/generated/vscode.json" "$HOME/.config/VSCodium/User/settings.json"
-  fi
+ln -nfs "$HOME/.config/matugen/generated/opencode.json" "$HOME/.config/opencode/themes/matugen.json"
+pkill -SIGUSR1 -x kitty || :
 '''
+
+# [templates.vscode]
+# input_path  = '~/.config/matugen/templates/vscode.json'
+# output_path = '~/.config/matugen/generated/vscode.json'
+# post_hook   = '''
+#   if command -v vscodium >/dev/null 2>&1; then
+#   ln -nfs "$HOME/.config/matugen/generated/vscode.json" "$HOME/.config/VSCodium/User/settings.json"
+#   fi
+# '''
 
 # [templates.alacritty]
 # input_path  = '~/.config/matugen/templates/alacritty.toml'
@@ -157,12 +157,12 @@ post_hook   = '''
 ln -nfs "$HOME/.config/matugen/generated/yazi-theme.toml" "$HOME/.config/yazi/theme.toml"
 '''
 
-[templates.zathura]
-input_path  = '~/.config/matugen/templates/zathura-colors'
-output_path = '~/.config/matugen/generated/zathura-colors'
-post_hook   = '''
-ln -nfs "$HOME/.config/matugen/generated/zathura-colors" "$HOME/.config/zathura/zathurarc"
-'''
+# [templates.zathura]
+# input_path  = '~/.config/matugen/templates/zathura-colors'
+# output_path = '~/.config/matugen/generated/zathura-colors'
+# post_hook   = '''
+# ln -nfs "$HOME/.config/matugen/generated/zathura-colors" "$HOME/.config/zathura/zathurarc"
+# '''
 
 # [templates.starship]
 # input_path = '~/.config/matugen/templates/starship-colors.toml'
@@ -205,15 +205,15 @@ post_hook   = '''
   fi
 '''
 
-[templates.vesktop]
-input_path  = '~/.config/matugen/templates/midnight-discord.css'
-output_path = '~/.config/matugen/generated/midnight-discord.css'
-post_hook   = '''
-if command -v vesktop >/dev/null 2>&1; then
-  mkdir -p "$HOME/.config/vesktop/themes/"
-  ln -nfs "$HOME/.config/matugen/generated/midnight-discord.css" "$HOME/.config/vesktop/themes/midnight-discord.css"
-fi
-'''
+# [templates.vesktop]
+# input_path  = '~/.config/matugen/templates/midnight-discord.css'
+# output_path = '~/.config/matugen/generated/midnight-discord.css'
+# post_hook   = '''
+# if command -v vesktop >/dev/null 2>&1; then
+#   mkdir -p "$HOME/.config/vesktop/themes/"
+#   ln -nfs "$HOME/.config/matugen/generated/midnight-discord.css" "$HOME/.config/vesktop/themes/midnight-discord.css"
+# fi
+# '''
 
 # [templates.beeper]
 # input_path  = '~/.config/matugen/templates/beeper.css'
@@ -225,28 +225,28 @@ fi
 #   fi
 # '''
 
-[templates.spicetify]
-input_path  = '~/.config/matugen/templates/spotify-colors.ini'
-output_path = '~/.config/matugen/generated/spotify-colors.ini'
-post_hook   = '''
-if command -v spicetify >/dev/null 2>&1 && [ -d "$HOME/.config/spicetify/Themes/Comfy" ]; then
-    ln -nfs "$HOME/.config/matugen/generated/spotify-colors.ini" "$HOME/.config/spicetify/Themes/Comfy/color.ini"
-    spicetify apply -n || :
-    hyprctl dispatch sendshortcut "CTRL SHIFT, R, class:^(spotify)$" || :
-fi
-'''
+# [templates.spicetify]
+# input_path  = '~/.config/matugen/templates/spotify-colors.ini'
+# output_path = '~/.config/matugen/generated/spotify-colors.ini'
+# post_hook   = '''
+# if command -v spicetify >/dev/null 2>&1 && [ -d "$HOME/.config/spicetify/Themes/Comfy" ]; then
+#     ln -nfs "$HOME/.config/matugen/generated/spotify-colors.ini" "$HOME/.config/spicetify/Themes/Comfy/color.ini"
+#     spicetify apply -n || :
+#     hyprctl dispatch sendshortcut "CTRL SHIFT, R, class:^(spotify)$" || :
+# fi
+# '''
 
-[templates.steam]
-input_path  = '~/.config/matugen/templates/steam.css'
-output_path = '~/.config/matugen/generated/steam.css'
-post_hook =  '''
-  if command -v steam >/dev/null 2>&1; then
-    gsettings set io.github.Foldex.AdwSteamGtk prefs-install-custom-css true || :
-    gsettings set io.github.Foldex.AdwSteamGtk window-controls-layout-options 'None' || :
-    ln -nfs "$HOME/.config/matugen/generated/steam.css" "$HOME/.config/AdwSteamGtk/custom.css";
-    adwaita-steam-gtk -i || :
-  fi
-'''
+# [templates.steam]
+# input_path  = '~/.config/matugen/templates/steam.css'
+# output_path = '~/.config/matugen/generated/steam.css'
+# post_hook =  '''
+#   if command -v steam >/dev/null 2>&1; then
+#     gsettings set io.github.Foldex.AdwSteamGtk prefs-install-custom-css true || :
+#     gsettings set io.github.Foldex.AdwSteamGtk window-controls-layout-options 'None' || :
+#     ln -nfs "$HOME/.config/matugen/generated/steam.css" "$HOME/.config/AdwSteamGtk/custom.css";
+#     adwaita-steam-gtk -i || :
+#   fi
+# '''
 
 [templates.cava]
 input_path  = '~/.config/matugen/templates/cava-colors.ini'
@@ -312,11 +312,6 @@ post_hook   = '''
 [templates.firefox_websites]
 input_path = '~/.config/matugen/templates/firefox_websites.css'
 output_path = '~/.config/matugen/generated/firefox_websites.css'
-post_hook   = '''
-    ln -nfs "$HOME/.config/matugen/generated/firefox_websites.css" "$HOME/.config/mozilla/firefox/nnnsdkhm.default-release/chrome/colors.css"
+post_hook = '''
+    ln -nfs "/home/dusk/.config/matugen/generated/firefox_websites.css" "/home/dusk/.mozilla/firefox/dd7ma16i.default-release/chrome/colors.css"
 '''
-
-[templates.sddm_sync]
-input_path  = '~/.config/matugen/templates/colors.css' # Any valid template file
-output_path = '~/.config/matugen/generated/sddm-sync-check'
-post_hook   = 'printf "%s" "{{image}}" > /tmp/sddm-sync-pending'

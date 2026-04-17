@@ -43,9 +43,9 @@ else
 fi
 
 # --- Logging -----------------------------------------------------------------
-log_info()  { printf '%s[INFO]%s %s\n' "${BLU}" "${RST}" "$*"; }
-log_ok()    { printf '%s[ OK ]%s %s\n' "${GRN}" "${RST}" "$*"; }
-log_warn()  { printf '%s[WARN]%s %s\n' "${YEL}" "${RST}" "$*" >&2; }
+log_info() { printf '%s[INFO]%s %s\n' "${BLU}" "${RST}" "$*"; }
+log_ok() { printf '%s[ OK ]%s %s\n' "${GRN}" "${RST}" "$*"; }
+log_warn() { printf '%s[WARN]%s %s\n' "${YEL}" "${RST}" "$*" >&2; }
 log_error() { printf '%s[ERR ]%s %s\n' "${RED}" "${RST}" "$*" >&2; }
 
 # --- Status Indicator --------------------------------------------------------

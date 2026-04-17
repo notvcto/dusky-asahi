@@ -97,7 +97,7 @@ pages:
         title: Active Profile
         description: Select performance mode
         icon: power-profile-balanced-symbolic
-        value_command: "powerprofilesctl get"
+        value_command: "tlpctl get"
         interval: 2
         options:
         - Balanced
@@ -110,13 +110,13 @@ pages:
       on_change:
         Balanced:
           type: exec
-          command: powerprofilesctl set balanced && notify-send 'Power Profile' 'Switched to Balanced'
+          command: tlpctl balanced && notify-send 'Power Profile' 'Switched to Balanced'
         Performance:
           type: exec
-          command: powerprofilesctl set performance && notify-send 'Power Profile' 'Switched to Performance'
+          command: tlpctl performance && notify-send 'Power Profile' 'Switched to Performance'
         Power Saver:
           type: exec
-          command: powerprofilesctl set power-saver && notify-send 'Power Profile' 'Switched to Power Saver'
+          command: tlpctl power-saver && notify-send 'Power Profile' 'Switched to Power Saver'
   - type: section
     properties:
       title: Quick Controls
@@ -229,7 +229,7 @@ pages:
         button_text: "Step 2"
       on_press:
         type: exec
-        command: kitty --class ORCHESTRA_ASAHI.sh --hold sh -c $HOME/user_scripts/arch_setup_scripts/ORCHESTRA_ASAHI.sh
+        command: kitty --class ORCHESTRA.sh --hold sh -c $HOME/user_scripts/arch_setup_scripts/ORCHESTRA.sh
         terminal: false
 
 
@@ -818,7 +818,7 @@ pages:
         title: Active Profile
         description: Select performance mode
         icon: power-profile-balanced-symbolic
-        value_command: "powerprofilesctl get"
+        value_command: "tlpctl get"
         interval: 2
         options:
         - Balanced
@@ -831,13 +831,13 @@ pages:
       on_change:
         Balanced:
           type: exec
-          command: powerprofilesctl set balanced && notify-send 'Power Profile' 'Switched to Balanced'
+          command: tlpctl balanced && notify-send 'Power Profile' 'Switched to Balanced'
         Performance:
           type: exec
-          command: powerprofilesctl set performance && notify-send 'Power Profile' 'Switched to Performance'
+          command: tlpctl performance && notify-send 'Power Profile' 'Switched to Performance'
         Power Saver:
           type: exec
-          command: powerprofilesctl set power-saver && notify-send 'Power Profile' 'Switched to Power Saver'
+          command: tlpctl power-saver && notify-send 'Power Profile' 'Switched to Power Saver'
     - type: toggle
       properties:
         title: Dusky Power Saver
@@ -1620,7 +1620,7 @@ pages:
                 button_text: "Run"
               on_press:
                 type: exec
-                command: kitty --class 035_configure_uwsm_gpu_asahi.sh --hold sh -c "$HOME/user_scripts/arch_setup_scripts/scripts/035_configure_uwsm_gpu_asahi.sh"
+                command: kitty --class 000_configure_uwsm_gpu.sh --hold sh -c "$HOME/user_scripts/arch_setup_scripts/scripts/035_configure_uwsm_gpu.sh"
         - type: section
           properties:
             title: Environment Variable files
@@ -2428,7 +2428,17 @@ pages:
                 terminal: false
             - type: button
               properties:
-                title: "Step 2: Install"
+                title: "Step 2: Sound Packs"
+                description: Downlaod Sound Packs
+                icon: audio-speakers-symbolic
+                button_text: "Download"
+              on_press:
+                type: exec
+                command: kitty --class wayclick_soundpacks_download.sh --hold sh -c "$HOME/user_scripts/wayclick/sounds/wayclick_soundpacks_download.sh --auto --force"
+                terminal: false
+            - type: button
+              properties:
+                title: "Step 3: Install"
                 description: Setup Dusky Wayclick
                 icon: system-software-install-symbolic
                 button_text: "Install"
@@ -2438,7 +2448,7 @@ pages:
                 terminal: false
             - type: button
               properties:
-                title: "Step 3: Configuration"
+                title: "Step 4: Configuration"
                 description: Manage Wayclick sounds and logic
                 icon: preferences-desktop-keyboard-shortcuts-symbolic
                 buttons:

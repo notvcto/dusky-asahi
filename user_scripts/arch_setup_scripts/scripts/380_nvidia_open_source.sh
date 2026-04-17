@@ -11,13 +11,6 @@
 
 # --- 1. STRICT MODE ---
 set -euo pipefail
-
-# Architecture Guard
-if [[ "$(uname -m)" == "aarch64" ]]; then
-    printf '\e[1;33m[NOTICE]\e[0m NVIDIA drivers are not applicable on Apple Silicon (aarch64).\n'
-    printf '         GPU is Apple AGX — no NVIDIA hardware present.\n'
-    exit 0
-fi
 shopt -s extglob nullglob
 
 # --- 2. GLOBAL STATE ---
