@@ -52,7 +52,7 @@
 
 ### Filesystem
 
-> **BTRFS recommended.** When the Asahi installer asks which variant to install, choose the **BTRFS ** option. It automatically sets up two subvolumes (`@` for `/` and `@home` for `/home`) — exactly what the snapper snapshot scripts expect.
+> **BTRFS required** for snapshots. The "Asahi Alarm Desktop (BTRFS)" installer option creates two subvolumes: `@` (for `/`) and `@home` (for `/home`). ORCHESTRA_ASAHI adds two more — `@log` (for `/var/log`) and `@pkg` (for `/var/cache/pacman/pkg`) — so snapshots of `/` don't bloat with logs and package caches.
 
 BTRFS also gives you:
 
@@ -60,7 +60,7 @@ BTRFS also gives you:
 - Copy-on-Write to prevent data corruption
 - Instant snapshots via snapper
 
-The setup should also work on ext4, but snapshots won't be available.
+ext4 also works but snapshots won't be available.
 
 ### GPU
 
@@ -70,55 +70,86 @@ GPU environment is auto-detected by `035_configure_uwsm_gpu_asahi.sh`, which wri
 
 ## Installation 💿
 
-### Phase 1 — Install Asahi Linux
+### Phase 1 — Install Asahi Linux from macOS
 
-Run the Asahi ALARM installer from macOS Terminal:
+#### Step 1 — Run the installer
+
+Open **Terminal** in macOS and run:
 
 ```bash
 curl https://asahi-alarm.org/installer-bootstrap.sh | sh
 ```
 
-When prompted by the installer:
+Enter your macOS admin password when prompted. Requires macOS 13.5 or later.
 
-- Choose **Desktop** (NOT minimal)
-- Choose **Hyprland** 
-- Choose the **BTRFS variant** — sets up `@` and `@home` subvolumes automatically
+#### Step 2 — Resize macOS and allocate space
 
-Default credentials after first boot:
-- User: `alarm` / Password: `alarm`
-- Root: `root` / Password: `root`
+The installer shows your disk layout and asks what to do. If macOS fills the whole disk:
+
+- Choose `r` — **Resize an existing partition**
+- Enter the new size for macOS. Examples:
+  - `80GB` — keeps 80 GB for macOS, remainder goes to Linux
+  - `50%` — 50/50 split
+  - `min` — shrinks macOS as small as safely possible
+
+> Minimum for Dusky: ~15 GB (12 GB root image + EFI + overhead). **30 GB+ recommended.**
+
+After resizing, free space appears in the list.
+
+#### Step 3 — Select the OS and install
+
+- Choose `f` — **Install an OS into free space**
+- From the OS list, select: **`Asahi Alarm Desktop (BTRFS)`**
+
+  > **Do not choose Minimal** — you need the Desktop variant to get the Calamares graphical installer.  
+  > **Do not choose the non-BTRFS Desktop** — BTRFS is required for snapshots.
+
+- Press Enter to accept the firmware version
+- Enter your macOS admin password when prompted
+
+The installer downloads and writes the OS (~12 GB). This takes several minutes.
+
+#### Step 4 — 1TR recovery boot (critical)
+
+When the installer finishes it **shuts down** the machine and prints a step-by-step sequence. Read it before the screen goes blank:
+
+1. Wait **~25 seconds** for the machine to fully power off
+2. Press and **hold** the power button — keep holding until you see "Loading startup options..." or a spinner
+3. Release the button
+4. A volume picker appears → select **`Asahi Alarm Desktop (BTRFS)`**
+5. A "macOS Recovery" dialog briefly appears, then the **"Asahi Linux installer"** screen appears → press Enter
+
+You will be prompted for your **macOS credentials** (the same macOS admin account you used in Step 1) — **twice**. This step lowers the security level on the Linux partition and installs the m1n1 bootloader. macOS security is unaffected.
+
+The machine reboots automatically when done.
+
+#### Step 5 — Calamares graphical setup
+
+The machine boots into Calamares:
+
+1. Choose language, keyboard layout, and timezone
+2. Create a **username and password** — these become your Linux login
+3. When asked for a desktop environment, select **Hyprland**
+4. Calamares installs to disk and reboots
 
 ---
 
 ### Phase 2 — Deploy Dusky Asahi
 
-All pacman operations require root. Switch to root first:
+SDDM appears after reboot. Log in with the credentials you created in Step 5.
+
+Open a terminal and install git, then clone the dotfiles:
 
 ```bash
-su root
-# password: root
-```
-
-Initialize the pacman keyring (required on every fresh ALARM install before using pacman):
-
-```bash
-pacman-key --init
-pacman-key --populate archlinuxarm
-```
-
-Install git and clone the dotfiles:
-
-```bash
-pacman -Syu git
+sudo pacman -Syu git
 
 git clone --bare --depth 1 https://github.com/notvcto/dusky-asahi.git ~/dusky
 git --git-dir=~/dusky/ --work-tree=$HOME checkout -f
 ```
 
-Run the orchestrator as your **normal user** (`alarm`), not root:
+Run the orchestrator as your **normal user** (not root):
 
 ```bash
-su alarm
 ~/user_scripts/arch_setup_scripts/ORCHESTRA_ASAHI.sh
 ```
 
@@ -136,6 +167,7 @@ Setup is split into numbered subscripts in `user_scripts/arch_setup_scripts/scri
 |---|---|
 | `035_configure_uwsm_gpu_asahi.sh` | Detects the AGX DRM node and writes `~/.config/uwsm/env.d/gpu` |
 | `051_pacman_asahi_repos.sh` | Adds the `[asahi-alarm]` overlay repo; bootstraps the keyring; ensures sudo and sudoers are present |
+| `053_btrfs_subvolumes_asahi.sh` | Creates `@log` and `@pkg` BTRFS subvolumes (the installer only creates `@` and `@home`) |
 | `060_package_installation_asahi.sh` | Full ARM64-adapted package install (Hyprland, PipeWire, mesa from asahi-alarm, etc.) |
 | `100_paru_packages_asahi.sh` | AUR packages with x86-only entries removed; adds `shellcheck-bin` (official ARM64 binary) |
 | `290_system_services_asahi.sh` | Enables system services; `power-profiles-daemon` replaces TLP; `iio-sensor-proxy` for ambient light |
@@ -147,7 +179,7 @@ Everything else (Hyprland config, theming, Waybar, Rofi, SDDM theme, PipeWire, s
 
 ## Hardware status
 
-Real hardware testing in progress (M1/M2).
+Real hardware testing in progress on M1 Pro (14-core GPU, MacBook Pro 14").
 
 | Feature | Status | Notes |
 |---|---|---|
@@ -194,7 +226,7 @@ Real hardware testing in progress (M1/M2).
 - GUI sliders for volume, brightness, and night light intensity (keybind-invokable)
 - Speech-to-text: Whisper (CPU)
 - Text-to-speech: Kokoro (CPU and GPU)
-- Touchpad gestures for volume, brightness, screen lock, Swaync, play/pause, mute
+- Touchpad gestures for volume, brightness, screen lock, notifications, play/pause, mute
 
 ### Hyprland & desktop
 
@@ -203,7 +235,7 @@ Real hardware testing in progress (M1/M2).
 - Dynamic fractional scaling — scale your display with a keybind
 - Toggle window transparency, blur, and shadow with a single keybind
 - Hypridle TUI configuration
-- Switch Swaync notification panel side (left/right)
+- Mako notification configurator (timeout, style, DnD toggle via Rofi)
 - Wlogout drawn dynamically to respect your fractional scaling
 - Battery notifications with configurable threshold levels
 - Toggleable power-saver mode
