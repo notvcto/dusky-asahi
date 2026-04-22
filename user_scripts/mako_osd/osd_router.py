@@ -14,7 +14,7 @@ SYNC_ID = "sys-osd"
 ROUTER_SCRIPT = os.path.expanduser("~/user_scripts/mako_osd/osd_router.sh")
 
 # Set to True if you remap CapsLock to Escape/Ctrl in Hyprland config
-IGNORE_RAW_CAPSLOCK = False 
+IGNORE_RAW_CAPSLOCK = True
 
 _active_tasks: Set[asyncio.Task] = set()
 _monitored_devices: Set[str] = set()
