@@ -174,6 +174,43 @@ check_esp_capacity() {
     fi
 }
 
+uninstall_and_cleanup_limine_snapper_sync() {
+    info "Cleaning up legacy limine-snapper-sync to prevent out-of-space pacman hook notifications..."
+    
+    # Halt active daemon/paths
+    sudo systemctl stop limine-snapper-sync.service 2>/dev/null || true
+    sudo systemctl disable limine-snapper-sync.service 2>/dev/null || true
+    sudo systemctl stop limine-snapper-sync.path 2>/dev/null || true
+    sudo systemctl disable limine-snapper-sync.path 2>/dev/null || true
+
+    # Strip the package to obliterate the alpm hooks
+    if pacman -Q limine-snapper-sync >/dev/null 2>&1; then
+        info "Uninstalling limine-snapper-sync..."
+        sudo pacman -Rns --noconfirm limine-snapper-sync || true
+    fi
+    
+    # Forensic sweep of the ESP to reclaim hostage storage
+    local esp_mnt
+    esp_mnt="$(findmnt -n -e -o TARGET -M /boot 2>/dev/null || findmnt -n -e -o TARGET -M /efi 2>/dev/null || findmnt -n -e -o TARGET -M /boot/efi 2>/dev/null || true)"
+    
+    if [[ -n "$esp_mnt" ]]; then
+        local snap_dirs=("limine-snapshots" "EFI/limine/snapshots" "limine/snapshots")
+        local dir
+        for dir in "${snap_dirs[@]}"; do
+            if sudo test -d "$esp_mnt/$dir"; then
+                info "Reclaiming space: Deleting orphaned snapshots at $esp_mnt/$dir..."
+                sudo rm -rf "$esp_mnt/$dir"
+            fi
+        done
+        
+        # Purge auto-generated include configs
+        sudo rm -f "$esp_mnt/limine-snapshots.conf" 2>/dev/null || true
+        sudo rm -f "$esp_mnt/EFI/limine/limine-snapshots.conf" 2>/dev/null || true
+    fi
+    
+    sudo rm -f /etc/limine-snapper-sync.conf
+}
+
 install_aur_packages() {
     local sync_in=false hook_in=false
     pacman -Q limine-snapper-sync >/dev/null 2>&1 && sync_in=true
@@ -186,7 +223,9 @@ install_aur_packages() {
     else
         [[ -n "$ESP_CAPACITY_WARN" ]] && warn "$ESP_CAPACITY_WARN"
         if [[ "$sync_in" == true ]]; then
-            warn "limine-snapper-sync is currently installed but ESP is too small. It will be disabled."
+            warn "limine-snapper-sync is installed but ESP is too small. Initiating complete teardown..."
+            uninstall_and_cleanup_limine_snapper_sync
+            sync_in=false
         fi
     fi
 
@@ -420,7 +459,7 @@ enable_services_and_sync() {
     info "Enabled snapper cleanup timer."
 
     if [[ "$ESP_SUFFICIENT_FOR_SYNC" == false ]]; then
-        warn "ESP is less than 2GB. Disabling limine-snapper-sync.service."
+        warn "ESP is less than 2GB. limine-snapper-sync integration is disabled."
         sudo systemctl disable --now limine-snapper-sync.service 2>/dev/null || true
         warn "Btrfs snapshots will still be taken automatically by snap-pac, but must be restored manually via Live USB if needed."
         return 0

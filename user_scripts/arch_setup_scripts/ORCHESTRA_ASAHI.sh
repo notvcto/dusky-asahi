@@ -26,6 +26,7 @@
 #  KEY DIFFERENCES FROM ORCHESTRA.sh:
 #    - 035_configure_uwsm_gpu_asahi.sh  instead of 035_configure_uwsm_gpu.sh
 #    - 051_pacman_asahi_repos.sh        added (Asahi overlay + mesa-asahi-edge)
+#    - 051_pacman_hooks.sh              added (waybar update counter hook)
 #    - 060_package_installation_asahi.sh instead of 060_package_installation.sh
 #    - 100_paru_packages_asahi.sh       instead of 100_paru_packages.sh
 #    - 053_btrfs_subvolumes_asahi.sh    added (creates @log + @pkg; ALARM only ships @ and @home)
@@ -80,6 +81,7 @@ INSTALL_SEQUENCE=(
 #   055_pacman_reflector.sh omitted: reflector is x86 Arch mirrors only;
 #   ALARM uses GitHub Releases for the asahi-alarm repo — no mirror ranking needed.
     "S | 051_pacman_asahi_repos.sh"
+    "S | 051_pacman_hooks.sh --auto"
     "S | 053_btrfs_subvolumes_asahi.sh"
     "S | 060_package_installation_asahi.sh"
     "U | 065_enabling_user_services.sh"
@@ -113,7 +115,7 @@ INSTALL_SEQUENCE=(
     "U | 236_browser_switcher.sh --firefox"
     "U | 237_text_editer_switcher.sh --gnome-text-editor"
     "U | 238_terminal_switcher.sh --kitty"
-    "U | 240_swaync_dgpu_fix.sh --disable"
+#   240_swaync_dgpu_fix.sh omitted: swaync replaced by mako
     "U | 280_dusk_clipboard_errands_delete.sh --delete"
     "S | 290_system_services_asahi.sh"
     "S | 330_gtk_root_symlink.sh"

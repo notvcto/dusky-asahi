@@ -46,7 +46,7 @@ declare -ar pkgs_appearance=(
 # Group 4: Desktop Experience
 declare -ar pkgs_desktop=(
   "waybar" "awww" "hyprlock" "hypridle" "hyprsunset" "hyprpicker"
-  "swaync" "swayosd" "rofi" "libdbusmenu-qt5" "libdbusmenu-glib"
+  "mako" "rofi" "libdbusmenu-qt5" "libdbusmenu-glib"
   "brightnessctl"
 )
 
@@ -82,7 +82,7 @@ declare -ar pkgs_filesystem=(
 # Group 7: Network & Internet
 declare -ar pkgs_network=(
   "networkmanager" "wireless-regdb" "iwd" "nm-connection-editor"
-  "inetutils" "wget" "curl" "openssh" "firewalld" "vsftpd"
+  "inetutils" "wget" "curl" "openssh" "ufw" "vsftpd"
   # reflector removed: x86 Arch only, not in ALARM repos
   "bmon" "ethtool" "httrack" "wavemon" "firefox"
   "nss-mdns" "dnsmasq" "modemmanager"

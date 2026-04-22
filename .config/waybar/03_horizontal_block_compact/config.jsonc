@@ -100,10 +100,11 @@
       "dnd-inhibited-none": "󰂛"
     },
     "return-type": "json",
-    "exec-if": "which swaync-client",
-    "exec": "swaync-client -swb",
-    "on-click": "swaync-client -t -sw",
-    "on-click-right": "swaync-client -d -sw",
+    "exec-if": "which makoctl",
+    "exec": "~/user_scripts/waybar/mako.sh",
+    "on-click": "~/user_scripts/rofi/rofi_mako.sh",
+    "on-click-right": "makoctl mode -t do-not-disturb && pkill -RTMIN+8 waybar",
+    "signal": 8,
     "escape": true,
     "tooltip-format": "Notifications\n\n LMB Toggle Panel\n RMB  Do Not Disturb"
   },

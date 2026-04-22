@@ -21,13 +21,13 @@ readonly TARGET_SERVICES=(
     "power-profiles-daemon.service"   # Apple Silicon power management (replaces TLP)
     "udisks2.service"
     "bluetooth.service"
-    "firewalld.service"
+    "ufw.service"
     "fstrim.timer"
     "systemd-timesyncd.service"
     # acpid.service removed: x86 ACPI event daemon, not applicable on Apple Silicon
     "iio-sensor-proxy.service"  # ambient light sensor / auto-brightness (MacBook)
     "vsftpd.service"
-    "swayosd-libinput-backend.service"
+    # swayosd removed (switched to mako OSD)
     "systemd-resolved.service"
 )
 

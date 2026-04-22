@@ -47,6 +47,7 @@ INSTALL_SEQUENCE=(
     "U | 040_long_sleep_timeout.sh --auto"
 #    "S | 045_battery_limiter.sh"
     "S | 050_pacman_config.sh --auto"
+    "S | 051_pacman_hooks.sh --auto"
     "S | 055_pacman_reflector.sh"
     "S | 060_package_installation.sh"
     "U | 065_enabling_user_services.sh"
@@ -93,7 +94,6 @@ INSTALL_SEQUENCE=(
 
     "U | 237_text_editer_switcher.sh --gnome-text-editor"
     "U | 238_terminal_switcher.sh --kitty"
-    "U | 240_swaync_dgpu_fix.sh --disable"
 #    "S | 245_asusd_service_fix.sh"
 #    "S | 250_ftp_arch.sh"
 #    "U | 255_tldr_update.sh"
