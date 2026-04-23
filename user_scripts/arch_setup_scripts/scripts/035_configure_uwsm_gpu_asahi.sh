@@ -15,7 +15,7 @@ readonly UWSM_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/uwsm"
 readonly ENV_DIR="$UWSM_CONFIG_DIR/env.d"
 readonly OUTPUT_FILE="$ENV_DIR/gpu"
 
-if [[ -t 1 ]]; then
+if [[ -t 2 ]]; then
     readonly BOLD=$'\033[1m'
     readonly BLUE=$'\033[34m'
     readonly GREEN=$'\033[32m'
@@ -26,13 +26,14 @@ else
     readonly BOLD='' BLUE='' GREEN='' YELLOW='' RED='' RESET=''
 fi
 
-log_info() { printf '%s[INFO]%s %s\n' "${BLUE}${BOLD}" "${RESET}" "$*"; }
-log_ok()   { printf '%s[OK]%s   %s\n' "${GREEN}${BOLD}" "${RESET}" "$*"; }
+# All log functions write to stderr so stdout stays clean for data capture.
+log_info() { printf '%s[INFO]%s %s\n' "${BLUE}${BOLD}" "${RESET}" "$*" >&2; }
+log_ok()   { printf '%s[OK]%s   %s\n' "${GREEN}${BOLD}" "${RESET}" "$*" >&2; }
 log_warn() { printf '%s[WARN]%s %s\n' "${YELLOW}${BOLD}" "${RESET}" "$*" >&2; }
 log_err()  { printf '%s[ERROR]%s %s\n' "${RED}${BOLD}" "${RESET}" "$*" >&2; }
 
 TEMP_OUTPUT=''
-cleanup() { [[ -n "${TEMP_OUTPUT:-}" ]] && rm -f -- "$TEMP_OUTPUT"; }
+cleanup() { if [[ -n "${TEMP_OUTPUT:-}" ]]; then rm -f -- "$TEMP_OUTPUT"; fi; }
 trap cleanup EXIT
 
 # Confirm we are on Apple Silicon via device tree model string.
@@ -137,9 +138,9 @@ main() {
     fi
 
     log_info "Active config:"
-    printf '%s\n' '-------------------------------------'
-    cat "$OUTPUT_FILE"
-    printf '%s\n' '-------------------------------------'
+    printf '%s\n' '-------------------------------------' >&2
+    cat "$OUTPUT_FILE" >&2
+    printf '%s\n' '-------------------------------------' >&2
     log_ok "Done. Restart your UWSM session to apply."
 }
 
