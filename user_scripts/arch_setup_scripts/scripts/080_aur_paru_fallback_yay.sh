@@ -16,7 +16,7 @@ shopt -s nullglob
 # --- Configuration ---
 readonly PARU_URL="https://aur.archlinux.org/paru.git"
 readonly YAY_URL="https://aur.archlinux.org/yay.git"
-readonly PARU_DEPS=("base-devel" "git" "rust" "openssl")
+readonly PARU_DEPS=("base-devel" "git" "rust" "openssl" "pkgconf")
 readonly YAY_DEPS=("base-devel" "git" "go")
 readonly PACMAN_DB="/var/lib/pacman/local"
 readonly LOCK_FILE="/tmp/aur_helper_installer.lock"

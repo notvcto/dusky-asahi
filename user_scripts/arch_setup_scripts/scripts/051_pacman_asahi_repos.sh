@@ -166,6 +166,19 @@ if grep -qF 'SigLevel = Never' "$PACMAN_CONF"; then
     log_success "SigLevel upgraded to Required DatabaseOptional."
 fi
 
+# ── Step 4b: Strip x86-only CFLAGS from makepkg.conf ────────────────────────
+# -fcf-protection (Control Flow Enforcement) is x86-only. On aarch64 it causes
+# Rust crates that probe-compile C code (e.g. openssl-sys) to fail, surfacing
+# as "Failed to find OpenSSL development headers" even when openssl is installed.
+
+if grep -q 'fcf-protection' /etc/makepkg.conf; then
+    log_info "Removing -fcf-protection flag from /etc/makepkg.conf (aarch64 incompatible)..."
+    sed -i 's/-fcf-protection[^ "]*//g' /etc/makepkg.conf
+    log_success "makepkg.conf patched."
+else
+    log_info "makepkg.conf already clean — skipping."
+fi
+
 # ── Step 5: Final sync with signatures required ───────────────────────────────
 
 log_info "Final pacman database sync (signed mode)..."
