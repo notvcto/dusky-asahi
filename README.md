@@ -143,8 +143,8 @@ Open a terminal and install git, then clone the dotfiles:
 ```bash
 sudo pacman -Syu git
 
-git clone --bare --depth 1 https://github.com/notvcto/dusky-asahi.git ~/dusky
-git --git-dir=~/dusky/ --work-tree=$HOME checkout -f
+git clone --bare --depth 1 https://github.com/notvcto/dusky-asahi.git $HOME/dusky
+git --git-dir=$HOME/dusky/ --work-tree=$HOME checkout -f
 ```
 
 Run the orchestrator as your **normal user** (not root):
