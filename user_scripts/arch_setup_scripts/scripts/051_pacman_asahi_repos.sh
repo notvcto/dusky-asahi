@@ -171,12 +171,24 @@ fi
 # Rust crates that probe-compile C code (e.g. openssl-sys) to fail, surfacing
 # as "Failed to find OpenSSL development headers" even when openssl is installed.
 
+readonly USER_MKCFG="${HOME}/.config/pacman/makepkg.conf"
+if [[ -f "$USER_MKCFG" ]]; then
+    log_info "Patching $USER_MKCFG for aarch64 (removing x86-only CARCH/CHOST/CFLAGS)..."
+    sed -i \
+        '/^CARCH=/d' \
+        "$USER_MKCFG"
+    sed -i \
+        '/^CHOST=/d' \
+        "$USER_MKCFG"
+    sed -i \
+        's/-fcf-protection[^ "]*//g' \
+        "$USER_MKCFG"
+    log_success "$USER_MKCFG patched."
+fi
 if grep -q 'fcf-protection' /etc/makepkg.conf; then
-    log_info "Removing -fcf-protection flag from /etc/makepkg.conf (aarch64 incompatible)..."
+    log_info "Removing -fcf-protection from /etc/makepkg.conf..."
     sed -i 's/-fcf-protection[^ "]*//g' /etc/makepkg.conf
-    log_success "makepkg.conf patched."
-else
-    log_info "makepkg.conf already clean — skipping."
+    log_success "/etc/makepkg.conf patched."
 fi
 
 # ── Step 5: Final sync with signatures required ───────────────────────────────
