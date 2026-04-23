@@ -135,6 +135,15 @@ build_helper() {
         cd "$1"
         git clone --depth 1 "$2" "$3"
         cd "$3"
+        # On aarch64 override CFLAGS/CHOST entirely — do not inherit from
+        # ~/.config/pacman/makepkg.conf which may carry x86-only flags.
+        if [[ "$(uname -m)" == "aarch64" ]]; then
+            export CARCH="aarch64"
+            export CHOST="aarch64-unknown-linux-gnu"
+            export CFLAGS="-march=native -O2 -pipe -fno-plt -fexceptions -fstack-clash-protection"
+            export CXXFLAGS="$CFLAGS -Wp,-D_GLIBCXX_ASSERTIONS"
+            export CARGO_BUILD_TARGET="aarch64-unknown-linux-gnu"
+        fi
         makepkg --noconfirm -cf
     ' -- "$BUILD_DIR" "$url" "$pkg_name"; then
         log_error "Compilation of $pkg_name failed."
