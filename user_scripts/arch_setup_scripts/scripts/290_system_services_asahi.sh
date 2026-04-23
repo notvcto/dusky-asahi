@@ -66,6 +66,31 @@ main() {
         enable_service "$service"
     done
 
+    # ── Keyboard backlight permissions ────────────────────────────────────────
+    # On Asahi, /sys/class/leds/kbd_backlight/brightness is root-only by default.
+    # brightnessctl (used by osd_router.sh) needs write access for the video group.
+    local udev_rule="/etc/udev/rules.d/90-asahi-kbd-backlight.rules"
+    if [[ ! -f "$udev_rule" ]]; then
+        log_info "Writing keyboard backlight udev rule..."
+        cat >"$udev_rule" <<'EOF'
+# Allow video group to control Apple Silicon keyboard backlight
+ACTION=="add", SUBSYSTEM=="leds", KERNEL=="kbd_backlight", \
+  RUN+="/bin/chgrp video /sys/class/leds/%k/brightness", \
+  RUN+="/bin/chmod g+w /sys/class/leds/%k/brightness"
+EOF
+        udevadm control --reload-rules
+        # Apply immediately without reboot
+        if [[ -w /sys/class/leds/kbd_backlight/brightness ]]; then
+            : # already writable
+        else
+            chgrp video /sys/class/leds/kbd_backlight/brightness 2>/dev/null || true
+            chmod g+w  /sys/class/leds/kbd_backlight/brightness 2>/dev/null || true
+        fi
+        log_success "Keyboard backlight udev rule installed."
+    else
+        log_info "Keyboard backlight udev rule already present — skipping."
+    fi
+
     printf "\n--- Operation Complete ---\n"
 }
 
