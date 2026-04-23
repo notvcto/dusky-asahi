@@ -49,14 +49,21 @@ detect_apple_silicon() {
     log_warn "Could not confirm Apple Silicon via device tree — proceeding anyway."
 }
 
-# Find the Apple AGX DRM card node.
+# Find the Apple Silicon KMS display controller node for AQ_DRM_DEVICES.
 #
-# On Asahi the AGX GPU is a platform device: its sysfs path contains no PCI
-# domain and it has no device/vendor file. We skip any node that does carry a
-# recognised PCI vendor ID (Intel 0x8086, AMD 0x1002, NVIDIA 0x10de) and take
-# the first remaining card as the Apple GPU.
+# Apple Silicon exposes two separate DRM devices:
+#   card1  — AGX GPU (406xxxxxxx.gpu): render/compute only, NOT a KMS device.
+#             Aquamarine skips this because libseat reports it has no KMS.
+#   card2  — DCP display controller (soc:display-subsystem): the actual KMS
+#             device that drives the screen. This is what AQ_DRM_DEVICES needs.
+#   renderD128 — AGX render node; Aquamarine finds this automatically from card2.
+#
+# Strategy: prefer the device whose sysfs path contains "display-subsystem"
+# (the DCP/KMS controller). Fall back to any card with connector subdirs
+# (another KMS indicator), then to the first non-PCI card.
 find_apple_gpu_node() {
-    local card_path dev_node vendor_id found_node=''
+    local card_path dev_node vendor_id real_dev
+    local kms_node='' fallback_node=''
 
     for card_path in /sys/class/drm/card[0-9]*; do
         dev_node="/dev/dri/${card_path##*/}"
@@ -72,17 +79,35 @@ find_apple_gpu_node() {
             esac
         fi
 
-        found_node="$dev_node"
-        log_info "Found Apple AGX DRM node: $dev_node"
-        break
+        real_dev=$(readlink -f "$card_path/device" 2>/dev/null || true)
+
+        # Prefer the DCP display controller (KMS, drives the screen)
+        if [[ "$real_dev" == *"display-subsystem"* ]]; then
+            kms_node="$dev_node"
+            log_info "Found Apple DCP display controller (KMS): $dev_node"
+            break
+        fi
+
+        # Alternative KMS indicator: card has connector subdirectories
+        local connectors=("$card_path"/card*-*/)
+        if [[ ${#connectors[@]} -gt 0 && -e "${connectors[0]}" ]]; then
+            kms_node="$dev_node"
+            log_info "Found KMS device with connectors: $dev_node"
+            break
+        fi
+
+        # Record first non-PCI card as last-resort fallback
+        [[ -z "$fallback_node" ]] && fallback_node="$dev_node"
     done
 
-    # Last-resort fallback: use the first available card
+    local found_node="${kms_node:-$fallback_node}"
+
+    # Final fallback: first card in the system
     if [[ -z "$found_node" ]]; then
         local fallback_cards=(/sys/class/drm/card[0-9]*)
         if (( ${#fallback_cards[@]} > 0 )); then
             found_node="/dev/dri/${fallback_cards[0]##*/}"
-            log_warn "No unambiguous AGX node found — falling back to $found_node"
+            log_warn "No KMS node found — falling back to $found_node"
         fi
     fi
 
@@ -101,7 +126,7 @@ main() {
         exit 1
     fi
 
-    log_info "Selected GPU node: $gpu_node"
+    log_info "Selected KMS display node: $gpu_node"
     mkdir -p -- "$ENV_DIR"
 
     TEMP_OUTPUT=$(mktemp "$ENV_DIR/.gpu.XXXXXX")
@@ -115,7 +140,8 @@ main() {
         printf 'export ELECTRON_OZONE_PLATFORM_HINT=auto\n'
         printf 'export MOZ_ENABLE_WAYLAND=1\n'
         printf '\n'
-        printf '# Apple AGX GPU — Hyprland / Aquamarine DRM device\n'
+        printf '# Apple DCP display controller (KMS) — required by Hyprland / Aquamarine\n'
+        printf '# card1 (AGX GPU) is render-only; AQ_DRM_DEVICES must point to the KMS device.\n'
         printf 'export AQ_DRM_DEVICES="%s"\n' "$gpu_node"
         printf '\n'
         printf '# AGX cursor plane not yet fully supported; disable hardware cursors.\n'
