@@ -143,7 +143,6 @@ build_helper() {
             _clean_xdg=$(mktemp -d)
             trap "rm -rf \"$_clean_xdg\"" EXIT
             export XDG_CONFIG_HOME="$_clean_xdg"
-            export CARGO_BUILD_TARGET="aarch64-unknown-linux-gnu"
         fi
         makepkg --noconfirm -cf
     ' -- "$BUILD_DIR" "$url" "$pkg_name"; then
