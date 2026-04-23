@@ -135,13 +135,14 @@ build_helper() {
         cd "$1"
         git clone --depth 1 "$2" "$3"
         cd "$3"
-        # On aarch64 override CFLAGS/CHOST entirely — do not inherit from
-        # ~/.config/pacman/makepkg.conf which may carry x86-only flags.
+        # On aarch64, redirect XDG_CONFIG_HOME to an empty temp dir so makepkg
+        # cannot find ~/.config/pacman/makepkg.conf and only sources the clean
+        # ALARM /etc/makepkg.conf. Without this, the deployed dotfile (which
+        # carries x86-only CFLAGS/CARCH/CHOST) overwrites any env var overrides.
         if [[ "$(uname -m)" == "aarch64" ]]; then
-            export CARCH="aarch64"
-            export CHOST="aarch64-unknown-linux-gnu"
-            export CFLAGS="-march=native -O2 -pipe -fno-plt -fexceptions -fstack-clash-protection"
-            export CXXFLAGS="$CFLAGS -Wp,-D_GLIBCXX_ASSERTIONS"
+            _clean_xdg=$(mktemp -d)
+            trap "rm -rf \"$_clean_xdg\"" EXIT
+            export XDG_CONFIG_HOME="$_clean_xdg"
             export CARGO_BUILD_TARGET="aarch64-unknown-linux-gnu"
         fi
         makepkg --noconfirm -cf

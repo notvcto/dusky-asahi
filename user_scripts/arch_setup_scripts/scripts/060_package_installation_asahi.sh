@@ -71,7 +71,7 @@ declare -ar pkgs_filesystem=(
 
   # nemo file manager
   "nemo" "nemo-fileroller" "file-roller" "gvfs" "gvfs-smb" "gvfs-mtp"
-  "gvfs-gphoto2" "gvfs-google" "gvfs-nfs" "gvfs-afc" "gvfs-dnssd"
+  "gvfs-gphoto2" "gvfs-nfs" "gvfs-afc" "gvfs-dnssd"
   "ffmpegthumbnailer" "webp-pixbuf-loader" "poppler-glib" "libgsf"
   "gnome-epub-thumbnailer" "resvg" "nemo-terminal" "nemo-python"
   "nemo-compare" "meld" "nemo-media-columns" "nemo-audio-tab"
@@ -94,7 +94,7 @@ declare -ar pkgs_terminal=(
   "kitty" "foot" "zsh" "zsh-syntax-highlighting" "starship" "fastfetch"
   "bat" "eza" "fd" "yazi" "gum" "tree" "fzf" "less" "ripgrep" "expac"
   "zsh-autosuggestions" "iperf3" "pkgstats" "libqalculate" "moreutils"
-  "zoxide" "opencode"
+  "zoxide"
 )
 
 # Group 9: Development
